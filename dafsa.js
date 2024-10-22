@@ -141,7 +141,7 @@ class DAFSA {
         this.non_final_to_final_conversion(currentState); // converts from non final to final state
         return;
       }
-      const n = Object.keys(this.states).length; // get the number of states in the machine
+      let n = Object.keys(this.states).length; // get the number of states in the machine
       //
       for (let index = 0; index < slen; index++) {
         if (index >= ind && index !== slen - 1) {

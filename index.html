@@ -3,14 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>DAFSA</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div>
+        <label for="acceptedString"></label>
+        <input type="text" placeholder="Type here to add an accepted string" name="acceptedString" id="acceptedString">
+        <button id="addBtn">Add</button>
+    </div>
+    <div>
+        <label for="search"></label>
+        <input type="text" placeholder="Type here to search for an accepted string" name="search" id="searchText">
+        <button id="searchBtn">Search</button>
+    </div>
     <div id="machine">
         
     </div>
-    <button id="btn">click</button>
     <script src="leader-line.min.js"></script>
     <script src="dafsa.js"></script>
     <script src="main.js"></script>
