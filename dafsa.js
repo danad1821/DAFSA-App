@@ -1,3 +1,25 @@
+let machine = document.getElementById("machine");
+
+function addState(state, isFinal) {
+  let st = document.createElement("div");
+  let stClasses = st.classList;
+  stClasses.add("state");
+  st.textContent=state;
+  st.setAttribute('id', state.toString());
+  if(isFinal){
+    stClasses.add('finalState')
+  }
+  machine.appendChild(st)
+}
+
+function addEdge(state1, state2, sym){
+  new LeaderLine(
+    document.getElementById(state1),
+    document.getElementById(state2),
+    {endLabel: LeaderLine.pathLabel(sym)}
+  );
+}
+
 class DAFSA {
   constructor() {
     this.states = {};
@@ -31,6 +53,7 @@ class DAFSA {
     ) {
       this.final_states.push(state); // adds the state to the final states
       this.states[state] = []; // Initialize empty list for the states it goes to
+      addState(state, true);
       return true; //state is added
     } else {
       return false; // state already exists
@@ -44,6 +67,7 @@ class DAFSA {
     ) {
       this.non_final_states.push(state); //adds the state to the non final states
       this.states[state] = []; // Initialize empty list for the states it goes to
+      addState(state, false)
       return true; //state is added
     } else {
       return false; // state already exists
@@ -52,7 +76,7 @@ class DAFSA {
 
   non_final_to_final_conversion(state) {
     // converts no final states into final states
-    // this is needed if the user for example added the string 'aa' before string 'a' and they are both accepted 
+    // this is needed if the user for example added the string 'aa' before string 'a' and they are both accepted
     this.non_final_states = this.non_final_states.filter((s) => s !== state); //removes the state from the non final states
     this.final_states.push(state); // adds it to the final
   }
@@ -71,6 +95,7 @@ class DAFSA {
 
     const added_edge = [v2, sym];
     this.states[v1].push(added_edge); // adds array of state and symbol seen to get to it
+    addEdge(v1, v2, sym);
     return true; // edge has been added
   }
 
@@ -78,16 +103,18 @@ class DAFSA {
     //checks if a string is accepted by the machine
     let currentState = this.initial_state;
 
-    for (const character of s) { // goes the characters of the string being searched for
+    for (const character of s) {
+      // goes the characters of the string being searched for
       if (this.states[currentState].length === 0) {
-        //if there are more characters but the current state doesn't have any edges 
+        //if there are more characters but the current state doesn't have any edges
         return false;
       }
 
       let changeOccurred = false;
       for (const v of this.states[currentState]) {
-        if (v[1] === character) { // sees if there is a transition on the current character
-          currentState = v[0]; // changes the current state to the state it reached 
+        if (v[1] === character) {
+          // sees if there is a transition on the current character
+          currentState = v[0]; // changes the current state to the state it reached
           changeOccurred = true; // changes the value of changeOccured since a change occured
           break;
         }
@@ -103,20 +130,23 @@ class DAFSA {
 
   add_accepted_string(s) {
     const slen = s.length;
-    if (this.initial_state === null) { // if it is the first string to be accepted by the machine
+    if (this.initial_state === null) {
+      // if it is the first string to be accepted by the machine
       // adds an initial state
-      this.add_initial_state("-1, 0");
+      this.add_initial_state("q0");
       //adds states until before it the last character is reached
       for (let i = 0; i < slen; i++) {
-        if (i + 1 !== slen) { // checks to make sure what is being added is not the final state
-          this.add_non_final_state("-1, " + (i + 1));
-          this.add_edge("-1, " + i, "-1, " + (i + 1), s[i]);
+        if (i + 1 !== slen) {
+          // checks to make sure what is being added is not the final state
+          this.add_non_final_state("q" + (i + 1));
+          this.add_edge("q" + i, "q" + (i + 1), s[i]);
         }
       }
       //adds final state and the the edge to get to it
-      this.add_final_state("-1, " + slen);
-      this.add_edge("-1, " + (slen - 1), "-1, " + slen, s[slen - 1]);
-    } else { // there already is one accepted string
+      this.add_final_state("q" + slen);
+      this.add_edge("q" + (slen - 1), "q" + slen, s[slen - 1]);
+    } else {
+      // there already is one accepted string
       let currentState = this.initial_state;
       let ind = 0; // used to know where to start adding more states from
 
@@ -127,7 +157,7 @@ class DAFSA {
           if (v[1] === s[index]) {
             currentState = v[0]; //changes the current state to the one reached by the machine
             ind = index + 1; // add 1 to ind to later determine where to start adding states
-            changeOccurred = true;// changes the value of changeOccured since a change occured
+            changeOccurred = true; // changes the value of changeOccured since a change occured
             break;
           }
         }
@@ -145,15 +175,15 @@ class DAFSA {
       //
       for (let index = 0; index < slen; index++) {
         if (index >= ind && index !== slen - 1) {
-          this.add_non_final_state("-1, " + n);
-          this.add_edge(currentState, "-1, " + n, s[index]);
-          currentState = "-1, " + n; //changes current state to the state just creates
+          this.add_non_final_state("q" + n);
+          this.add_edge(currentState, "q" + n, s[index]);
+          currentState = "q" + n; //changes current state to the state just creates
           n++; // adds 1 to n
         }
       }
       // adds the final state used to accept this new string
-      this.add_final_state("-1, " + n);
-      this.add_edge(currentState, "-1, " + n, s[slen - 1]);
+      this.add_final_state("q" + n);
+      this.add_edge(currentState, "q" + n, s[slen - 1]);
     }
   }
 
@@ -162,7 +192,7 @@ class DAFSA {
     return this.states;
   }
 
-  minimize_dafsa(D){
-    console.log('minimized machine')
+  minimize_dafsa(D) {
+    console.log("minimized machine");
   }
 }
