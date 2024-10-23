@@ -1,5 +1,3 @@
-let machine = document.getElementById("machine");
-
 class DAFSA {
   constructor() {
     this.states = {};
@@ -170,20 +168,20 @@ class DAFSA {
   }
 
   createDirectedGraph() {
-    machine.innerHTML="";
+    machine.innerHTML = "";
     let nodes = [];
     let links = [];
-    let symbols=[]
+    let symbols = [];
     for (const v of Object.keys(this.states)) {
       nodes.push({ id: v.toString() });
       for (const edge of this.states[v]) {
         links.push({ source: v.toString(), target: edge[0].toString() });
-        symbols.push(edge[1])
+        symbols.push(edge[1]);
       }
     }
 
     const color = d3.scaleOrdinal(d3.schemeCategory10);
-    const width = 928;
+    const width = 900;
     const height = 600;
     const simulation = d3
       .forceSimulation(nodes)
@@ -206,7 +204,7 @@ class DAFSA {
     // Add a line for each link, and a circle for each node.
     const link = svg
       .append("g")
-      .attr("stroke", "#999")
+      .attr("stroke", "#000")
       .attr("stroke-opacity", 0.6)
       .selectAll()
       .data(links)
@@ -220,11 +218,31 @@ class DAFSA {
       .selectAll()
       .data(nodes)
       .join("circle")
-      .attr("r", 10)
-      .attr("fill", (d) => color(d.group));
+      .attr("r", 25)
+      .attr("fill", "gray")
+      .attr("width", 50) // Set width directly
+      .attr("height", 50) // Set height directly
+      .style("border", (d) =>
+        this.final_states.includes(d.id)
+          ? "1px solid black double"
+          : "1px solid black"
+      )
+      .style("border-radius", "100%")
+      .style("display", "flex")
+      .style("align-items", "center")
+      .style("justify-content", "center")
+      .style("margin", "15px");
 
     node.append("title").text((d) => d.id);
-
+    // Add text elements inside the nodes
+    const nodeTexts = svg
+      .append("g")
+      .selectAll("text")
+      .data(nodes)
+      .enter()
+      .append("text")
+      .text((d) => d.id)
+      .attr("color", "#fff");
     // Add a drag behavior.
     node.call(
       d3
@@ -236,6 +254,8 @@ class DAFSA {
 
     // Set the position attributes of links and nodes each time the simulation ticks.
     function ticked() {
+      nodeTexts.attr("x", (d) => d.x);
+      nodeTexts.attr("y", (d) => d.y);
       link
         .attr("x1", (d) => d.source.x)
         .attr("y1", (d) => d.source.y)
@@ -265,11 +285,10 @@ class DAFSA {
       event.subject.fx = null;
       event.subject.fy = null;
     }
-    
+
     let sv = document.createElement("svg");
     sv = svg.node();
-    return svg.node()
-    
+    return svg.node();
   }
 
   minimize_dafsa(D) {
