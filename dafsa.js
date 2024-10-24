@@ -170,9 +170,9 @@ class DAFSA {
 
   createDirectedGraph() {
     machine.innerHTML = "";
-    let nodes = [];
-    let links = [];
-    let symbols = [];
+    let nodes = [{id: 'start'}];
+    let links = [{source: 'start', target:'q0'}];
+    let symbols = ['~'];
     let linkArc = (d) =>
       `M${d.source.x},${d.source.y}A0,0 0 0,1 ${d.target.x},${d.target.y}`;
     for (const v of Object.keys(this.states)) {
@@ -226,6 +226,7 @@ class DAFSA {
       .append("g")
       .attr("fill", "none")
       .attr("stroke-width", 1.5)
+      .attr("class", "linkLabel")
       .selectAll("path")
       .data(links)
       .join("path")
@@ -234,6 +235,19 @@ class DAFSA {
         "marker-end",
         (d) => `url(#arrow-${symbols[links.indexOf(d)]})` // Access symbol by index
       );
+    const linkLabelContainer = svg.selectAll(".linkLabel").data(links);
+    const linkLabel = linkLabelContainer
+      .enter()
+      .append("text")
+      .attr("class", "linkLabel")
+      .attr("dy", 5)
+      .attr("filter", "url(#solid)")
+      .text(function (d) {
+        return symbols[links.indexOf(d)];
+      });
+    linkLabelContainer.exit().remove();
+    
+
     //create nodes
     const node = svg
       .append("g")
@@ -254,6 +268,7 @@ class DAFSA {
     node
       .append("circle") //outter circle
       .attr("stroke", "black")
+      .attr("opacity", (d) => (d.id === "start" ? 0 : 1))
       .attr("stroke-width", 1.5)
       .attr("r", 25)
       .attr("fill", (d) => "#6baed6");
@@ -278,12 +293,14 @@ class DAFSA {
       .attr("fill", "none")
       .attr("stroke", "white")
       .attr("stroke-width", 3);
-
     node.on("dblclick", (e, d) => console.log(nodes[d.index]));
 
     simulation.on("tick", () => {
       link.attr("d", linkArc);
       node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+      linkLabel
+      .attr("x", (d) => (d.source.x + d.target.x) / 2) // Center label between nodes
+      .attr("y", (d) => (d.source.y + d.target.y) / 2); // Center label between nodes
     });
     // Reheat the simulation when drag starts, and fix the subject position.
     function dragstarted(event) {
