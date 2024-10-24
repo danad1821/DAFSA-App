@@ -183,7 +183,7 @@ class DAFSA {
       }
     }
 
-    const color = d3.scaleOrdinal(symbols, d3.schemeCategory10);
+    const color = d3.scaleOrdinal(symbols, d3.schemeCategory10); //creates different colors depending on symbol
     const width = 900;
     const height = 600;
     const simulation = d3
@@ -198,7 +198,8 @@ class DAFSA {
       .force(
         "collide",
         d3.forceCollide((d) => 65)
-      );
+      )
+      .alpha(0);
 
     const svg = d3
       .create("svg")
@@ -251,16 +252,26 @@ class DAFSA {
         .on("end", dragended)
     );
     node
-      .append("circle")
-      .attr("stroke", "white")
+      .append("circle") //outter circle
+      .attr("stroke", "black")
       .attr("stroke-width", 1.5)
       .attr("r", 25)
       .attr("fill", (d) => "#6baed6");
+    //if the state is a final state it adds another circle
+    node
+      .selectAll("circle.inner") // Select inner circles based on class
+      .data((d) => (this.final_states.includes(d.id) ? [d] : [])) // Join data based on condition
+      .join("circle")
+      .attr("class", "inner") // Add class for conditional selection
+      .attr("r", 20) // Inner circle radius
+      .attr("stroke", "black")
+      .attr("stroke-width", 1.5)
+      .attr("fill", (d) => "#6baed6"); // Fill inner circle
 
     node
       .append("text")
-      .attr("x", (d) => d.x)
-      .attr("y", (d) => d.y)
+      .attr("x", -6) // Center text horizontally
+      .attr("y", 5) // Adjust y-coordinate for vertical positioning
       .text((d) => d.id)
       .clone(true)
       .lower()
