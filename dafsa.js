@@ -1,3 +1,4 @@
+let machine = document.getElementById("machine");
 class DAFSA {
   constructor() {
     this.states = {};
@@ -172,6 +173,8 @@ class DAFSA {
     let nodes = [];
     let links = [];
     let symbols = [];
+    let linkArc = (d) =>
+      `M${d.source.x},${d.source.y}A0,0 0 0,1 ${d.target.x},${d.target.y}`;
     for (const v of Object.keys(this.states)) {
       nodes.push({ id: v.toString() });
       for (const edge of this.states[v]) {
@@ -180,7 +183,7 @@ class DAFSA {
       }
     }
 
-    const color = d3.scaleOrdinal(d3.schemeCategory10);
+    const color = d3.scaleOrdinal(symbols, d3.schemeCategory10);
     const width = 900;
     const height = 600;
     const simulation = d3
@@ -189,60 +192,56 @@ class DAFSA {
         "link",
         d3.forceLink(links).id((d) => d.id)
       )
-      .force("charge", d3.forceManyBody())
-      .force("center", d3.forceCenter(width / 2, height / 2))
-      .on("tick", ticked);
+      .force("charge", d3.forceManyBody().strength(-300))
+      .force("x", d3.forceX())
+      .force("y", d3.forceY())
+      .force(
+        "collide",
+        d3.forceCollide((d) => 65)
+      );
 
-    // Create the SVG container.
     const svg = d3
       .create("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", [0, 0, width, height])
-      .attr("style", "max-width: 100%; height: auto;");
+      .attr("viewBox", [-width / 2, -height / 2, width, height]);
 
-    // Add a line for each link, and a circle for each node.
+    // Per-type markers, as they don't inherit styles.
+    svg
+      .append("defs")
+      .selectAll("marker")
+      .data(symbols)
+      .join("marker")
+      .attr("id", (d) => `arrow-${d}`)
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", 38)
+      .attr("refY", 0)
+      .attr("markerWidth", 6)
+      .attr("markerHeight", 6)
+      .attr("orient", "auto")
+      .append("path")
+      .attr("fill", color)
+      .attr("d", "M0,-5L10,0L0,5");
+    //create links
     const link = svg
       .append("g")
-      .attr("stroke", "#000")
-      .attr("stroke-opacity", 0.6)
-      .selectAll()
+      .attr("fill", "none")
+      .attr("stroke-width", 1.5)
+      .selectAll("path")
       .data(links)
-      .join("line")
-      .attr("stroke-width", (d) => Math.sqrt(d.value));
-
+      .join("path")
+      .attr("stroke", (d) => color(symbols[links.indexOf(d)])) // Use indexOf
+      .attr(
+        "marker-end",
+        (d) => `url(#arrow-${symbols[links.indexOf(d)]})` // Access symbol by index
+      );
+    //create nodes
     const node = svg
       .append("g")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 3)
-      .selectAll()
+      .attr("fill", "currentColor")
+      .attr("stroke-linecap", "round")
+      .attr("stroke-linejoin", "round")
+      .selectAll("g")
       .data(nodes)
-      .join("circle")
-      .attr("r", 25)
-      .attr("fill", "gray")
-      .attr("width", 50) // Set width directly
-      .attr("height", 50) // Set height directly
-      .style("border", (d) =>
-        this.final_states.includes(d.id)
-          ? "1px solid black double"
-          : "1px solid black"
-      )
-      .style("border-radius", "100%")
-      .style("display", "flex")
-      .style("align-items", "center")
-      .style("justify-content", "center")
-      .style("margin", "15px");
-
-    node.append("title").text((d) => d.id);
-    // Add text elements inside the nodes
-    const nodeTexts = svg
-      .append("g")
-      .selectAll("text")
-      .data(nodes)
-      .enter()
-      .append("text")
-      .text((d) => d.id)
-      .attr("color", "#fff");
+      .join("g");
     // Add a drag behavior.
     node.call(
       d3
@@ -251,20 +250,30 @@ class DAFSA {
         .on("drag", dragged)
         .on("end", dragended)
     );
+    node
+      .append("circle")
+      .attr("stroke", "white")
+      .attr("stroke-width", 1.5)
+      .attr("r", 25)
+      .attr("fill", (d) => "#6baed6");
 
-    // Set the position attributes of links and nodes each time the simulation ticks.
-    function ticked() {
-      nodeTexts.attr("x", (d) => d.x);
-      nodeTexts.attr("y", (d) => d.y);
-      link
-        .attr("x1", (d) => d.source.x)
-        .attr("y1", (d) => d.source.y)
-        .attr("x2", (d) => d.target.x)
-        .attr("y2", (d) => d.target.y);
+    node
+      .append("text")
+      .attr("x", (d) => d.x)
+      .attr("y", (d) => d.y)
+      .text((d) => d.id)
+      .clone(true)
+      .lower()
+      .attr("fill", "none")
+      .attr("stroke", "white")
+      .attr("stroke-width", 3);
 
-      node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
-    }
+    node.on("dblclick", (e, d) => console.log(nodes[d.index]));
 
+    simulation.on("tick", () => {
+      link.attr("d", linkArc);
+      node.attr("transform", (d) => `translate(${d.x},${d.y})`);
+    });
     // Reheat the simulation when drag starts, and fix the subject position.
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -285,7 +294,6 @@ class DAFSA {
       event.subject.fx = null;
       event.subject.fy = null;
     }
-
     let sv = document.createElement("svg");
     sv = svg.node();
     return svg.node();
