@@ -12,5 +12,6 @@ let searchBtn=document.getElementById('searchBtn');
 searchBtn.addEventListener("click", function(){
   let searchText=document.getElementById('searchText');
   let inMachine=D.isAccepted(searchText.value);
+  console.log(inMachine)
   searchText.value="";
 })

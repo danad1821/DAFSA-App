@@ -1,4 +1,10 @@
 let machine = document.getElementById("machine");
+function validate(x, a, b) {
+  if (x < a) x = a;
+  if (x > b) x = b;
+  return x;
+}
+
 class DAFSA {
   constructor() {
     this.states = {};
@@ -182,10 +188,9 @@ class DAFSA {
         symbols.push(edge[1]);
       }
     }
-
     const color = d3.scaleOrdinal(symbols, d3.schemeCategory10); //creates different colors depending on symbol
-    const width = 900;
-    const height = 600;
+    const width = screen.width*0.4;
+    const height = screen.height*0.5;
     const simulation = d3
       .forceSimulation(nodes)
       .force(
@@ -197,9 +202,9 @@ class DAFSA {
       .force("y", d3.forceY())
       .force(
         "collide",
-        d3.forceCollide((d) => 65)
+        d3.forceCollide((d) => 50)
       )
-      .alpha(0);
+      .alpha(1);
 
     const svg = d3
       .create("svg")
@@ -304,15 +309,18 @@ class DAFSA {
     });
     // Reheat the simulation when drag starts, and fix the subject position.
     function dragstarted(event) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
+      if (!event.active) simulation.alphaTarget(0.1).restart();
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;
+      event.fixed = true;
     }
 
     // Update the subject (dragged node) position during drag.
     function dragged(event) {
       event.subject.fx = event.x;
       event.subject.fy = event.y;
+      event.px = validate(event.px, 0, width);
+      event.py = validate(event.py, 0, height);
     }
 
     // Restore the target alpha so the simulation cools after dragging ends.
@@ -321,6 +329,8 @@ class DAFSA {
       if (!event.active) simulation.alphaTarget(0);
       event.subject.fx = null;
       event.subject.fy = null;
+      if (event.x < 0 || event.x > width || event.y < 0 || event.y > height)
+        event.fixed = false;
     }
     let sv = document.createElement("svg");
     sv = svg.node();

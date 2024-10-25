@@ -12,3 +12,6 @@
   border-style: double;
   border-width: 5px;
 }
+#machine{
+  border: 1px solid black;
+}
