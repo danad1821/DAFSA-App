@@ -3,6 +3,7 @@ let D = new DAFSA();
 let addBtn = document.getElementById('addBtn');
 let acceptedString = document.getElementById('acceptedString');
 let resetBtn = document.getElementById('resetBtn');
+let emptyStringCheckBox=document.getElementById('emptyCheckbox')
 
 function createMachine() { //function to create DAFSA machine
   D.add_accepted_string(acceptedString.value);
@@ -34,3 +35,13 @@ function resetMachine() {
 }
 
 resetBtn.addEventListener("click", resetMachine);
+
+emptyStringCheckBox.addEventListener('change', ()=>{
+  D.acceptance_of_empty_string(emptyStringCheckBox.checked)
+  if(emptyStringCheckBox.checked==true || Object.keys(D.states).length>1){
+    machine.appendChild(D.createDirectedGraph());
+  }
+  else{
+    machine.innerHTML="";
+  }
+})

@@ -64,6 +64,11 @@ class DAFSA {
     this.final_states.push(state); // adds it to the final
   }
 
+  final_to_non_final_conversion(state){
+    this.final_states = this.final_states.filter((s) => s !== state); //removes the state from the final states
+    this.non_final_states.push(state); // adds it to the non final
+  }
+
   add_edge(v1, v2, sym) {
     //adds a connects between 2 states by adding an array to the array for the state's key in the this.states object
     if (!this.states.hasOwnProperty(v1) || !this.states.hasOwnProperty(v2)) {
@@ -79,6 +84,19 @@ class DAFSA {
     const added_edge = [v2, sym];
     this.states[v1].push(added_edge); // adds array of state and symbol seen to get to it
     return true; // edge has been added
+  }
+
+  acceptance_of_empty_string(value){
+    this.accepts_empty_string=value;
+    if(value==true && this.initial_state!=null){
+      this.non_final_to_final_conversion(this.initial_state);
+    }
+    else if(value==true && this.initial_state==null){
+      this.add_initial_state('q0')
+    }
+    else{
+      this.final_to_non_final_conversion(this.initial_state);
+    }
   }
 
   isAccepted(s) {
@@ -276,7 +294,7 @@ class DAFSA {
       .attr("opacity", (d) => (d.id === "start" ? 0 : 1))
       .attr("stroke-width", 1.5)
       .attr("r", 25)
-      .attr("fill", (d) => "#7acdff");
+      .attr("fill", (d) => "white");
     //if the state is a final state it adds another circle
     node
       .selectAll("circle.inner") // Select inner circles based on class
@@ -286,7 +304,7 @@ class DAFSA {
       .attr("r", 20) // Inner circle radius
       .attr("stroke", "black")
       .attr("stroke-width", 1.5)
-      .attr("fill", (d) => "#7acdff"); // Fill inner circle
+      .attr("fill", (d) => "white"); // Fill inner circle
 
     node
       .append("text")
