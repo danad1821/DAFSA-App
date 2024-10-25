@@ -100,7 +100,6 @@ class DAFSA {
   isAccepted(s) {
     //checks if a string is accepted by the machine
     let currentState = this.initial_state;
-
     for (const character of s) {
       // goes to the characters of the string being searched for
       if (this.states[currentState].length === 0) {
@@ -110,9 +109,15 @@ class DAFSA {
 
       let changeOccurred = false;
       for (const v of this.states[currentState]) {
+        let curNodes=document.getElementsByClassName(currentState.toString());
         if (v[1] === character) {
+          if (curNodes.length > 0) {
+            Array.from(curNodes).forEach(node => {
+              node.style.stroke = 'green';
+            });
+          }
           // sees if there is a transition on the current character
-          currentState = v[0]; // changes the current state to the state it reached
+          currentState = v[0]; // changes the current state to the state it reaches
           changeOccurred = true; // changes the value of changeOccured since a change occured
           break;
         }
