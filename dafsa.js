@@ -58,7 +58,7 @@ class DAFSA {
   }
 
   non_final_to_final_conversion(state) {
-    // converts no final states into final states
+    // converts non final states into final states
     // this is needed if the user for example added the string 'aa' before string 'a' and they are both accepted
     this.non_final_states = this.non_final_states.filter((s) => s !== state); //removes the state from the non final states
     this.final_states.push(state); // adds it to the final
@@ -86,7 +86,7 @@ class DAFSA {
     let currentState = this.initial_state;
 
     for (const character of s) {
-      // goes the characters of the string being searched for
+      // goes to the characters of the string being searched for
       if (this.states[currentState].length === 0) {
         //if there are more characters but the current state doesn't have any edges
         return false;
@@ -176,8 +176,8 @@ class DAFSA {
 
   createDirectedGraph() {
     machine.innerHTML = "";
-    let nodes = [{id: 'start'}];
-    let links = [{source: 'start', target:'q0'}];
+    let nodes = [{ id: 'start' }];
+    let links = [{ source: 'start', target: 'q0' }];
     let symbols = ['~'];
     let linkArc = (d) =>
       `M${d.source.x},${d.source.y}A0,0 0 0,1 ${d.target.x},${d.target.y}`;
@@ -251,7 +251,7 @@ class DAFSA {
         return symbols[links.indexOf(d)];
       });
     linkLabelContainer.exit().remove();
-    
+
 
     //create nodes
     const node = svg
@@ -276,7 +276,7 @@ class DAFSA {
       .attr("opacity", (d) => (d.id === "start" ? 0 : 1))
       .attr("stroke-width", 1.5)
       .attr("r", 25)
-      .attr("fill", (d) => "#6baed6");
+      .attr("fill", (d) => "#7acdff");
     //if the state is a final state it adds another circle
     node
       .selectAll("circle.inner") // Select inner circles based on class
@@ -286,7 +286,7 @@ class DAFSA {
       .attr("r", 20) // Inner circle radius
       .attr("stroke", "black")
       .attr("stroke-width", 1.5)
-      .attr("fill", (d) => "#6baed6"); // Fill inner circle
+      .attr("fill", (d) => "#7acdff"); // Fill inner circle
 
     node
       .append("text")
@@ -304,8 +304,8 @@ class DAFSA {
       link.attr("d", linkArc);
       node.attr("transform", (d) => `translate(${d.x},${d.y})`);
       linkLabel
-      .attr("x", (d) => (d.source.x + d.target.x) / 2) // Center label between nodes
-      .attr("y", (d) => (d.source.y + d.target.y) / 2); // Center label between nodes
+        .attr("x", (d) => (d.source.x + d.target.x) / 2) // Center label between nodes
+        .attr("y", (d) => (d.source.y + d.target.y) / 2); // Center label between nodes
     });
     // Reheat the simulation when drag starts, and fix the subject position.
     function dragstarted(event) {
