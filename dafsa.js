@@ -64,7 +64,7 @@ class DAFSA {
     this.final_states.push(state); // adds it to the final
   }
 
-  final_to_non_final_conversion(state){
+  final_to_non_final_conversion(state) {
     this.final_states = this.final_states.filter((s) => s !== state); //removes the state from the final states
     this.non_final_states.push(state); // adds it to the non final
   }
@@ -86,15 +86,13 @@ class DAFSA {
     return true; // edge has been added
   }
 
-  acceptance_of_empty_string(value){
-    this.accepts_empty_string=value;
-    if(value==true && this.initial_state!=null){
+  acceptance_of_empty_string(value) {
+    this.accepts_empty_string = value;
+    if (value == true && this.initial_state != null) {
       this.non_final_to_final_conversion(this.initial_state);
-    }
-    else if(value==true && this.initial_state==null){
-      this.add_initial_state('q0')
-    }
-    else{
+    } else if (value == true && this.initial_state == null) {
+      this.add_initial_state("q0");
+    } else {
       this.final_to_non_final_conversion(this.initial_state);
     }
   }
@@ -194,9 +192,9 @@ class DAFSA {
 
   createDirectedGraph() {
     machine.innerHTML = "";
-    let nodes = [{ id: 'start' }];
-    let links = [{ source: 'start', target: 'q0' }];
-    let symbols = ['~'];
+    let nodes = [{ id: "start" }];
+    let links = [{ source: "start", target: "q0" }];
+    let symbols = ["~"];
     let linkArc = (d) =>
       `M${d.source.x},${d.source.y}A0,0 0 0,1 ${d.target.x},${d.target.y}`;
     for (const v of Object.keys(this.states)) {
@@ -207,8 +205,8 @@ class DAFSA {
       }
     }
     const color = d3.scaleOrdinal(symbols, d3.schemeCategory10); //creates different colors depending on symbol
-    const width = screen.width*0.4;
-    const height = screen.height*0.5;
+    const width = machine.offsetWidth;
+    const height = machine.offsetHeight;
     const simulation = d3
       .forceSimulation(nodes)
       .force(
@@ -270,7 +268,6 @@ class DAFSA {
       });
     linkLabelContainer.exit().remove();
 
-
     //create nodes
     const node = svg
       .append("g")
@@ -294,6 +291,7 @@ class DAFSA {
       .attr("opacity", (d) => (d.id === "start" ? 0 : 1))
       .attr("stroke-width", 1.5)
       .attr("r", 25)
+      .attr('class', (d)=>d.id)
       .attr("fill", (d) => "white");
     //if the state is a final state it adds another circle
     node
@@ -304,6 +302,7 @@ class DAFSA {
       .attr("r", 20) // Inner circle radius
       .attr("stroke", "black")
       .attr("stroke-width", 1.5)
+      .attr('class', (d)=>d.id)
       .attr("fill", (d) => "white"); // Fill inner circle
 
     node
@@ -316,7 +315,20 @@ class DAFSA {
       .attr("fill", "none")
       .attr("stroke", "white")
       .attr("stroke-width", 3);
-    node.on("dblclick", (e, d) => console.log(nodes[d.index]));
+
+    let spacing = 100; // Adjust spacing between nodes
+    let xOffset = -width / 2.5;
+    let yOffset = -height / 3;
+
+    nodes.forEach((node, index) => {
+      node.fx = xOffset + (index % 5) * spacing;
+      node.fy = yOffset + Math.floor(index / 5) * spacing;
+      
+    });
+
+    // Start the simulation
+    simulation.alpha(1).restart();
+    node.on("click", (e, d) => console.log(nodes[d.index]));
 
     simulation.on("tick", () => {
       link.attr("d", linkArc);
@@ -324,6 +336,31 @@ class DAFSA {
       linkLabel
         .attr("x", (d) => (d.source.x + d.target.x) / 2) // Center label between nodes
         .attr("y", (d) => (d.source.y + d.target.y) / 2); // Center label between nodes
+
+      // Collision detection and response
+      for (let i = 0; i < 3; i++) {
+        // Iterate multiple times for better accuracy
+        nodes.forEach((node1) => {
+          nodes.forEach((node2) => {
+            if (node1 !== node2) {
+              const dx = node1.x - node2.x;
+              const dy = node1.y - node2.y;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+
+              const minDistance = node1.r + node2.r + spacing; // Consider node radii
+              if (distance < minDistance) {
+                const direction = { x: dx / distance, y: dy / distance };
+                const overlap = minDistance - distance;
+
+                node1.x += (direction.x * overlap) / 2;
+                node1.y += (direction.y * overlap) / 2;
+                node2.x -= (direction.x * overlap) / 2;
+                node2.y -= (direction.y * overlap) / 2;
+              }
+            }
+          });
+        });
+      }
     });
     // Reheat the simulation when drag starts, and fix the subject position.
     function dragstarted(event) {
