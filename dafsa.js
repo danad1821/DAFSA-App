@@ -209,6 +209,23 @@ class DAFSA {
     return this.states;
   }
 
+  remove_accepted_string(s) {
+    if (this.isAccepted(s)) {
+      let currentState = this.initial_state;
+      for (let index = 0; index < s.length; index++) {
+        for (const v of this.states[currentState]) {
+          if (v[1] === s[index]) {
+            currentState = v[0];
+            break;
+          }
+        }
+      }
+    }
+    else{
+      return false;
+    }
+  }
+
   createDirectedGraph() {
     machine.innerHTML = "";
     let nodes = [{ id: "start" }];
@@ -368,7 +385,6 @@ class DAFSA {
               if (distance < minDistance) {
                 const direction = { x: dx / distance, y: dy / distance };
                 const overlap = minDistance - distance;
-
                 node1.x += (direction.x * overlap) / 2;
                 node1.y += (direction.y * overlap) / 2;
                 node2.x -= (direction.x * overlap) / 2;

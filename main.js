@@ -45,3 +45,10 @@ emptyStringCheckBox.addEventListener('change', ()=>{
     machine.innerHTML="";
   }
 })
+
+let removeBtn=document.getElementById('removeBtn');
+removeBtn.addEventListener('click', ()=>{
+  let removeText=document.getElementById('removeText');
+  console.log(D.remove_accepted_string(removeText.value));
+  machine.appendChild(D.createDirectedGraph());
+})
