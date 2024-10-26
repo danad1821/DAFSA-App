@@ -5,6 +5,24 @@ function validate(x, a, b) {
   return x;
 }
 
+let curIndex = 0;
+
+function changeStateColor(state) {
+  let curNodes = document.getElementsByClassName(state.toString());
+  if (curNodes.length > 0) {
+    setTimeout(() => {
+      Array.from(curNodes).forEach((node) => {
+        node.style.stroke = "green";
+      });
+      curIndex += 1;
+    }, 5000 * curIndex);
+    setTimeout(() => {
+      Array.from(curNodes).forEach((node) => {
+        node.style.stroke = "black";
+      });
+    }, 20000);
+  }
+}
 class DAFSA {
   constructor() {
     this.states = {};
@@ -109,15 +127,11 @@ class DAFSA {
 
       let changeOccurred = false;
       for (const v of this.states[currentState]) {
-        let curNodes=document.getElementsByClassName(currentState.toString());
         if (v[1] === character) {
-          if (curNodes.length > 0) {
-            Array.from(curNodes).forEach(node => {
-              node.style.stroke = 'green';
-            });
-          }
+          changeStateColor(currentState);
           // sees if there is a transition on the current character
           currentState = v[0]; // changes the current state to the state it reaches
+          changeStateColor(currentState);
           changeOccurred = true; // changes the value of changeOccured since a change occured
           break;
         }
@@ -223,7 +237,7 @@ class DAFSA {
       .force("y", d3.forceY())
       .force(
         "collide",
-        d3.forceCollide((d) => 50)
+        d3.forceCollide((d) => d.r + 5)
       )
       .alpha(1);
 
@@ -296,7 +310,7 @@ class DAFSA {
       .attr("opacity", (d) => (d.id === "start" ? 0 : 1))
       .attr("stroke-width", 1.5)
       .attr("r", 25)
-      .attr('class', (d)=>d.id)
+      .attr("class", (d) => d.id)
       .attr("fill", (d) => "white");
     //if the state is a final state it adds another circle
     node
@@ -307,7 +321,7 @@ class DAFSA {
       .attr("r", 20) // Inner circle radius
       .attr("stroke", "black")
       .attr("stroke-width", 1.5)
-      .attr('class', (d)=>d.id)
+      .attr("class", (d) => d.id)
       .attr("fill", (d) => "white"); // Fill inner circle
 
     node
@@ -328,7 +342,6 @@ class DAFSA {
     nodes.forEach((node, index) => {
       node.fx = xOffset + (index % 5) * spacing;
       node.fy = yOffset + Math.floor(index / 5) * spacing;
-      
     });
 
     // Start the simulation
@@ -341,6 +354,42 @@ class DAFSA {
       linkLabel
         .attr("x", (d) => (d.source.x + d.target.x) / 2) // Center label between nodes
         .attr("y", (d) => (d.source.y + d.target.y) / 2); // Center label between nodes
+
+        const minDistance = 30;
+        const adjustmentFactor = 0.5;
+      // Update link positions based on collision avoidance
+      links.forEach((link1) => {
+        links.forEach((link2) => {
+          if (link1 !== link2) {
+            // Calculate the distance between the midpoints of the two links
+            const mid1x = (link1.source.x + link1.target.x) / 2;
+            const mid1y = (link1.source.y + link1.target.y) / 2;
+            const mid2x = (link2.source.x + link2.target.x) / 2;
+            const mid2y = (link2.source.y + link2.target.y) / 2;
+            const distance = Math.sqrt((mid1x - mid2x) ** 2 + (mid1y - mid2y) ** 2);
+      
+            // Adjust link positions if they are too close
+            if (distance < minDistance) {
+              // Calculate the direction vector between the midpoints
+              const dx = mid2x - mid1x;
+              const dy = mid2y - mid1y;
+              const length = Math.sqrt(dx * dx + dy * dy);
+      
+              // Adjust the position of link1
+              link1.source.x += dx / length * adjustmentFactor;
+              link1.source.y += dy / length * adjustmentFactor;
+              link1.target.x += dx / length * adjustmentFactor;
+              link1.target.y += dy / length * adjustmentFactor;
+      
+              // Adjust the position of link2 (optional, depending on your desired behavior)
+              link2.source.x -= dx / length * adjustmentFactor;
+              link2.source.y -= dy / length * adjustmentFactor;
+              link2.target.x -= dx / length * adjustmentFactor;
+              link2.target.y -= dy / length * adjustmentFactor;
+            }
+          }
+        });
+      });
 
       // Collision detection and response
       for (let i = 0; i < 3; i++) {
@@ -387,8 +436,8 @@ class DAFSA {
     // Unfix the subject position now that it’s no longer being dragged.
     function dragended(event) {
       if (!event.active) simulation.alphaTarget(0);
-      event.subject.fx = null;
-      event.subject.fy = null;
+      event.subject.fx = event.x;
+      event.subject.fy = event.y;
       if (event.x < 0 || event.x > width || event.y < 0 || event.y > height)
         event.fixed = false;
     }

@@ -1,39 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DAFSA</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<body>
+  <body>
     <div>
-        <label for="acceptedString"></label>
-        <input type="text" placeholder="Type here to add an accepted string" name="acceptedString" id="acceptedString">
-        <button id="addBtn">Add</button>
+      <label for="acceptedString"></label>
+      <input
+        type="text"
+        placeholder="Type here to add an accepted string"
+        name="acceptedString"
+        id="acceptedString"
+      />
+      <button id="addBtn">Add</button>
     </div>
     <div>
-        <label for="search"></label>
-        <input type="text" placeholder="Type here to search for an accepted string" name="search" id="searchText">
-        <button id="searchBtn">Search</button>
+      <label for="search"></label>
+      <input
+        type="text"
+        placeholder="Type here to search for an accepted string"
+        name="search"
+        id="searchText"
+      />
+      <button id="searchBtn">Search</button>
     </div>
     <button id="resetBtn">Reset Machine</button>
     <div>
-        <input type="checkbox" name="emptyString" id="emptyCheckbox">
-        <label for="emptyString">Accepts Empty String</label>
+      <input type="checkbox" name="emptyString" id="emptyCheckbox" />
+      <label for="emptyString">Accepts Empty String</label>
     </div>
-    <div id="machine">
-
-    </div>
-    <div id="stateInformation">
-        
-    </div>
+    <div id="machine"></div>
+    <div id="stateInformation"></div>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-cola@2.5.1/cytoscape-cola.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script src="leader-line.min.js"></script>
     <script src="dafsa.js"></script>
     <script src="main.js"></script>
-</body>
-
+  </body>
 </html>
