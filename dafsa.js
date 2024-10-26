@@ -240,7 +240,6 @@ class DAFSA {
         d3.forceCollide((d) => d.r + 5)
       )
       .alpha(1);
-
     const svg = d3
       .create("svg")
       .attr("viewBox", [-width / 2, -height / 2, width, height]);
@@ -354,42 +353,6 @@ class DAFSA {
       linkLabel
         .attr("x", (d) => (d.source.x + d.target.x) / 2) // Center label between nodes
         .attr("y", (d) => (d.source.y + d.target.y) / 2); // Center label between nodes
-
-        const minDistance = 30;
-        const adjustmentFactor = 0.5;
-      // Update link positions based on collision avoidance
-      links.forEach((link1) => {
-        links.forEach((link2) => {
-          if (link1 !== link2) {
-            // Calculate the distance between the midpoints of the two links
-            const mid1x = (link1.source.x + link1.target.x) / 2;
-            const mid1y = (link1.source.y + link1.target.y) / 2;
-            const mid2x = (link2.source.x + link2.target.x) / 2;
-            const mid2y = (link2.source.y + link2.target.y) / 2;
-            const distance = Math.sqrt((mid1x - mid2x) ** 2 + (mid1y - mid2y) ** 2);
-      
-            // Adjust link positions if they are too close
-            if (distance < minDistance) {
-              // Calculate the direction vector between the midpoints
-              const dx = mid2x - mid1x;
-              const dy = mid2y - mid1y;
-              const length = Math.sqrt(dx * dx + dy * dy);
-      
-              // Adjust the position of link1
-              link1.source.x += dx / length * adjustmentFactor;
-              link1.source.y += dy / length * adjustmentFactor;
-              link1.target.x += dx / length * adjustmentFactor;
-              link1.target.y += dy / length * adjustmentFactor;
-      
-              // Adjust the position of link2 (optional, depending on your desired behavior)
-              link2.source.x -= dx / length * adjustmentFactor;
-              link2.source.y -= dy / length * adjustmentFactor;
-              link2.target.x -= dx / length * adjustmentFactor;
-              link2.target.y -= dy / length * adjustmentFactor;
-            }
-          }
-        });
-      });
 
       // Collision detection and response
       for (let i = 0; i < 3; i++) {
