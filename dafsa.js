@@ -220,14 +220,16 @@ class DAFSA {
           }
         }
       }
-    }
-    else{
+    } else {
       return false;
     }
   }
 
   createDirectedGraph() {
     machine.innerHTML = "";
+    let nodeHierarchy={
+      'start':['q0']
+    }
     let nodes = [{ id: "start" }];
     let links = [{ source: "start", target: "q0" }];
     let symbols = ["~"];
@@ -235,28 +237,31 @@ class DAFSA {
       `M${d.source.x},${d.source.y}A0,0 0 0,1 ${d.target.x},${d.target.y}`;
     for (const v of Object.keys(this.states)) {
       nodes.push({ id: v.toString() });
+      nodeHierarchy[v]=[];
       for (const edge of this.states[v]) {
         links.push({ source: v.toString(), target: edge[0].toString() });
+        nodeHierarchy[v].push(edge[0]);
         symbols.push(edge[1]);
       }
     }
     const color = d3.scaleOrdinal(symbols, d3.schemeCategory10); //creates different colors depending on symbol
     const width = machine.offsetWidth;
     const height = machine.offsetHeight;
+   
     const simulation = d3
       .forceSimulation(nodes)
       .force(
         "link",
         d3.forceLink(links).id((d) => d.id)
       )
-      .force("charge", d3.forceManyBody().strength(-300))
+      .force("charge", d3.forceManyBody().strength(-1000))
       .force("x", d3.forceX())
       .force("y", d3.forceY())
       .force(
         "collide",
         d3.forceCollide((d) => d.r + 5)
       )
-      .alpha(1);
+      .alpha(0);
     const svg = d3
       .create("svg")
       .attr("viewBox", [-width / 2, -height / 2, width, height]);
@@ -351,14 +356,40 @@ class DAFSA {
       .attr("stroke", "white")
       .attr("stroke-width", 3);
 
-    let spacing = 100; // Adjust spacing between nodes
-    let xOffset = -width / 2.5;
+    let spacing = 70; // Adjust spacing between nodes
+    let xOffset = -width / 3;
     let yOffset = -height / 3;
 
-    nodes.forEach((node, index) => {
-      node.fx = xOffset + (index % 5) * spacing;
-      node.fy = yOffset + Math.floor(index / 5) * spacing;
-    });
+    // nodes.forEach((node, index) => {
+    //   node.fx = xOffset + (index % 1) * spacing;
+    //   node.fy = yOffset + Math.floor(index / 1) * spacing;
+    // });
+    function findNode(name) {
+      for (const node of nodes) {
+        if (node.id === name) {
+          return node;
+        }
+      }
+      return undefined;
+    }
+
+    function positionNodes(node, x, y, level, index) {
+      node.fx = x;
+      node.fy = y;
+    
+      let childX = x + spacing;
+      let childY = y + spacing;
+      if(index>0){
+        node.fx=node.fx*(-1)*index;
+        childX=x-spacing
+      }
+      nodeHierarchy[node.id].forEach((child, index) => {
+        positionNodes(findNode(child), childX, childY, level + 1, index);
+      });
+    }
+    
+    // Initial node positioning
+    positionNodes(findNode('start'), -100, -200, 0, 0); // Start with root node and no parent coordinates
 
     // Start the simulation
     simulation.alpha(1).restart();
@@ -372,28 +403,27 @@ class DAFSA {
         .attr("y", (d) => (d.source.y + d.target.y) / 2); // Center label between nodes
 
       // Collision detection and response
-      for (let i = 0; i < 3; i++) {
-        // Iterate multiple times for better accuracy
-        nodes.forEach((node1) => {
-          nodes.forEach((node2) => {
-            if (node1 !== node2) {
-              const dx = node1.x - node2.x;
-              const dy = node1.y - node2.y;
-              const distance = Math.sqrt(dx * dx + dy * dy);
+      // for (let i = 0; i < 3; i++) {
+      //   nodes.forEach((node1) => {
+      //     nodes.forEach((node2) => {
+      //       if (node1 !== node2) {
+      //         const dx = node1.x - node2.x;
+      //         const dy = node1.y - node2.y;
+      //         const distance = Math.sqrt(dx * dx + dy * dy);
 
-              const minDistance = node1.r + node2.r + spacing; // Consider node radii
-              if (distance < minDistance) {
-                const direction = { x: dx / distance, y: dy / distance };
-                const overlap = minDistance - distance;
-                node1.x += (direction.x * overlap) / 2;
-                node1.y += (direction.y * overlap) / 2;
-                node2.x -= (direction.x * overlap) / 2;
-                node2.y -= (direction.y * overlap) / 2;
-              }
-            }
-          });
-        });
-      }
+      //         const minDistance = node1.r + node2.r + spacing; // Consider node radii
+      //         if (distance < minDistance) {
+      //           const direction = { x: dx / distance, y: dy / distance };
+      //           const overlap = minDistance - distance;
+      //           node1.x += (direction.x * overlap) / 2;
+      //           node1.y += (direction.y * overlap) / 2;
+      //           node2.x -= (direction.x * overlap) / 2;
+      //           node2.y -= (direction.y * overlap) / 2;
+      //         }
+      //       }
+      //     });
+      //   });
+      // }
     });
     // Reheat the simulation when drag starts, and fix the subject position.
     function dragstarted(event) {
