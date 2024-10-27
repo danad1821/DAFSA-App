@@ -5,24 +5,6 @@ function validate(x, a, b) {
   return x;
 }
 
-let curIndex = 0;
-
-function changeStateColor(state) {
-  let curNodes = document.getElementsByClassName(state.toString());
-  if (curNodes.length > 0) {
-    setTimeout(() => {
-      Array.from(curNodes).forEach((node) => {
-        node.style.stroke = "green";
-      });
-      curIndex += 1;
-    }, 5000 * curIndex);
-    setTimeout(() => {
-      Array.from(curNodes).forEach((node) => {
-        node.style.stroke = "black";
-      });
-    }, 20000);
-  }
-}
 class DAFSA {
   constructor() {
     this.states = {};
@@ -115,6 +97,33 @@ class DAFSA {
     }
   }
 
+  colorChange(color, curNodes){
+    Array.from(curNodes).forEach((node) => {
+      node.style.fill = color;
+    });
+  }
+
+  changeStateColor(state) {
+    let curIndex = 0;
+    let curNodes = document.getElementsByClassName(state.toString());
+    if (curNodes.length > 0) {
+      if(this.final_states.includes(state)){
+        setTimeout(() => {
+          this.colorChange("green", curNodes)
+          curIndex += 1;
+        }, 5000 * curIndex);
+      }else{
+        setTimeout(() => {
+          this.colorChange("red", curNodes)
+          curIndex += 1;
+        }, 5000 * curIndex);
+      }
+      setTimeout(() => {
+        this.colorChange("white", curNodes)
+      }, 20000);
+    }
+  }
+
   isAccepted(s) {
     //checks if a string is accepted by the machine
     let currentState = this.initial_state;
@@ -128,10 +137,10 @@ class DAFSA {
       let changeOccurred = false;
       for (const v of this.states[currentState]) {
         if (v[1] === character) {
-          changeStateColor(currentState);
+          this.changeStateColor(currentState);
           // sees if there is a transition on the current character
           currentState = v[0]; // changes the current state to the state it reaches
-          changeStateColor(currentState);
+          this.changeStateColor(currentState);
           changeOccurred = true; // changes the value of changeOccured since a change occured
           break;
         }
@@ -226,16 +235,17 @@ class DAFSA {
   }
 
   createDirectedGraph() {
-    machine.innerHTML = "";
+    machine.innerHTML = ""; //clears the machine
     let nodeHierarchy = {
       start: ["q0"],
-    };
-    let nodes = [{ id: "start" }];
-    let links = [{ source: "start", target: "q0" }];
-    let symbols = ["~"];
+    }; // later used for structuring the graph
+    let nodes = [{ id: "start" }]; // all the nodes (states) of the graph
+    let links = [{ source: "start", target: "q0" }]; // the links (arrows) connecting the nodes
+    let symbols = ["~"]; // symbols used for transitions
     let linkArc = (d) =>
-      `M${d.source.x},${d.source.y}A0,0 0 0,1 ${d.target.x},${d.target.y}`;
-    for (const v of Object.keys(this.states)) {
+      `M${d.source.x},${d.source.y}A0,0 0 0,1 ${d.target.x},${d.target.y}`; //function to create the arrow head shape
+    for (const v of Object.keys(this.states)) { //goes through the directed graph to collect all nodes, links and symbols 
+      //also used to create the hierarchy
       nodes.push({ id: v.toString() });
       nodeHierarchy[v] = [];
       for (const edge of this.states[v]) {
@@ -244,9 +254,9 @@ class DAFSA {
         symbols.push(edge[1]);
       }
     }
-    const color = d3.scaleOrdinal(symbols, d3.schemeCategory10); //creates different colors depending on symbol
-    const width = machine.offsetWidth;
-    const height = machine.offsetHeight;
+    const color = d3.scaleOrdinal(symbols, d3.schemeCategory10); //creates different colored arrows depending on symbol
+    const width = machine.offsetWidth; //width of figure is equal to the machine div's width
+    const height = machine.offsetHeight; //height of figure is equal to the machine div's height
 
     const simulation = d3
       .forceSimulation(nodes)
@@ -254,49 +264,51 @@ class DAFSA {
         "link",
         d3.forceLink(links).id((d) => d.id)
       )
-      .force("charge", d3.forceManyBody().strength(-1000))
+      .force("charge", d3.forceManyBody().strength(-1000)) // preventing collision
       .force("x", d3.forceX())
       .force("y", d3.forceY())
       .force(
         "collide",
-        d3.forceCollide((d) => d.r + 5)
+        d3.forceCollide((d) => d.r + 5) // incase of collision
       )
-      .alpha(0);
+      .alpha(0); //creates force simulation which will graph the nodes and links
     const svg = d3
       .create("svg")
-      .attr("viewBox", [-width / 2, -height / 2, width, height]);
+      .attr("viewBox", [-width / 2, -height / 2, width, height]); //create the svg that will contain the force simulayion
 
     // Per-type markers, as they don't inherit styles.
     svg
       .append("defs")
       .selectAll("marker")
-      .data(symbols)
+      .data(symbols) // to add these on the arrows
       .join("marker")
-      .attr("id", (d) => `arrow-${d}`)
+      .attr("id", (d) => `arrow-${d}`) //to give it the arrow style and change the color depending on the symbol shown
       .attr("viewBox", "0 -5 10 10")
       .attr("refX", 38)
       .attr("refY", 0)
+      //styling for the arrow
       .attr("markerWidth", 6)
       .attr("markerHeight", 6)
       .attr("orient", "auto")
       .append("path")
       .attr("fill", color)
       .attr("d", "M0,-5L10,0L0,5");
-    //create links
+    //create links and adds them to svg
     const link = svg
-      .append("g")
-      .attr("fill", "none")
-      .attr("stroke-width", 1.5)
-      .attr("class", "linkLabel")
+      .append("g") // g is a tag specific to the d3.js library
+      .attr("fill", "none") 
+      .attr("stroke-width", 1.5) //the width of the links 
+      .attr("class", "linkLabel") //gives them a class 
       .selectAll("path")
-      .data(links)
+      .data(links) 
       .join("path")
-      .attr("stroke", (d) => color(symbols[links.indexOf(d)])) // Use indexOf
+      .attr("stroke", (d) => color(symbols[links.indexOf(d)])) // determines the color of the arrow by the input symbol
       .attr(
         "marker-end",
         (d) => `url(#arrow-${symbols[links.indexOf(d)]})` // Access symbol by index
-      );
-    const linkLabelContainer = svg.selectAll(".linkLabel").data(links);
+      ); // gets the tip of the arrow based off the input symbol
+    const linkLabelContainer = svg.selectAll(".linkLabel").data(links); // a container of the labels of the links
+    //creates the text that is placed on the link
     const linkLabel = linkLabelContainer
       .enter()
       .append("text")
@@ -305,9 +317,9 @@ class DAFSA {
       .attr("filter", "url(#solid)")
       .text(function (d) {
         return symbols[links.indexOf(d)];
-      });
+      });  
     linkLabelContainer.exit().remove();
-
+    
     //create nodes
     const node = svg
       .append("g")
@@ -317,7 +329,7 @@ class DAFSA {
       .selectAll("g")
       .data(nodes)
       .join("g");
-    // Add a drag behavior.
+    // Add a drag behavior to node so the nodes can be moved around
     node.call(
       d3
         .drag()
@@ -336,7 +348,7 @@ class DAFSA {
     //if the state is a final state it adds another circle
     node
       .selectAll("circle.inner") // Select inner circles based on class
-      .data((d) => (this.final_states.includes(d.id) ? [d] : [])) // Join data based on condition
+      .data((d) => (this.final_states.includes(d.id) ? [d] : [])) // Join data if the state is a final state
       .join("circle")
       .attr("class", "inner") // Add class for conditional selection
       .attr("r", 20) // Inner circle radius
@@ -358,6 +370,7 @@ class DAFSA {
 
     let spacing = 80; // Adjust spacing between nodes
     let fxyList = [];
+    //finds node based off node name
     function findNode(name) {
       for (const node of nodes) {
         if (node.id === name) {
@@ -366,68 +379,44 @@ class DAFSA {
       }
       return undefined;
     }
-
+    //positions nodes in places depending on the parent and hierarchy
     function positionNodes(node, x, y, level, index) {
-      node.fx = x;
-      node.fy = y;
-
+      node.fx = x; //sets x position of the node
+      node.fy = y; //sets y position of the node
+      // changes the postion for the child
       let childX = x + spacing;
       let childY = y + spacing;
-      if (index > 0) {
+      if (index > 0) { // if the parent has multiple children in the hierarchy than adjust spacing
         node.fx = node.fx - spacing * index;
         childX = node.fx;
-        if (fxyList.includes([childX, childY])) {
-          console.log("here");
-          childX += spacing * 2; // Shift by a fixed amount (adjust as needed)
-          childY += spacing * 2;
-        }
       }
-
+      if (fxyList.includes([childX, childY])) { // checks if there is already a node in thise postition
+        childX += spacing * 2;
+        childY += spacing * 2;
+      }
       fxyList.push([childX, childY]);
-
+      //recursively calls to postition the children
       nodeHierarchy[node.id].forEach((child, index) => {
         positionNodes(findNode(child), childX, childY, level + 1, index);
       });
     }
 
     // Initial node positioning
-    positionNodes(findNode("start"), -100, -200, 0, 0); // Start with root node and no parent coordinates
+    positionNodes(findNode("start"), -100, -200, 0, 0); // Start with root node
 
     // Start the simulation
     simulation.alpha(1).restart();
-    node.on("click", (e, d) => console.log(nodes[d.index]));
 
+    node.on("click", (e, d) => console.log(nodes[d.index]));
+    //for when the simulation starts to make sure the placement of the connections are correct
     simulation.on("tick", () => {
       link.attr("d", linkArc);
       node.attr("transform", (d) => `translate(${d.x},${d.y})`);
       linkLabel
         .attr("x", (d) => (d.source.x + d.target.x) / 2) // Center label between nodes
         .attr("y", (d) => (d.source.y + d.target.y) / 2); // Center label between nodes
-
-      // Collision detection and response
-      // for (let i = 0; i < 3; i++) {
-      //   nodes.forEach((node1) => {
-      //     nodes.forEach((node2) => {
-      //       if (node1 !== node2) {
-      //         const dx = node1.x - node2.x;
-      //         const dy = node1.y - node2.y;
-      //         const distance = Math.sqrt(dx * dx + dy * dy);
-
-      //         const minDistance = node1.r + node2.r + spacing; // Consider node radii
-      //         if (distance < minDistance) {
-      //           const direction = { x: dx / distance, y: dy / distance };
-      //           const overlap = minDistance - distance;
-      //           node1.x += (direction.x * overlap) / 2;
-      //           node1.y += (direction.y * overlap) / 2;
-      //           node2.x -= (direction.x * overlap) / 2;
-      //           node2.y -= (direction.y * overlap) / 2;
-      //         }
-      //       }
-      //     });
-      //   });
-      // }
     });
-    // Reheat the simulation when drag starts, and fix the subject position.
+    // Reheat the simulation when drag starts, and fix the node position.
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.1).restart();
       event.subject.fx = event.subject.x;
@@ -435,7 +424,7 @@ class DAFSA {
       event.fixed = true;
     }
 
-    // Update the subject (dragged node) position during drag.
+    // Update the dragged node position during drag.
     function dragged(event) {
       event.subject.fx = event.x;
       event.subject.fy = event.y;
@@ -452,6 +441,7 @@ class DAFSA {
       if (event.x < 0 || event.x > width || event.y < 0 || event.y > height)
         event.fixed = false;
     }
+    //returns the svg
     let sv = document.createElement("svg");
     sv = svg.node();
     return svg.node();
