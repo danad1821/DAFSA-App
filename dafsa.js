@@ -380,8 +380,8 @@ class DAFSA {
       let childX = x + spacing;
       let childY = y + spacing;
       if(index>0){
-        node.fx=node.fx*(-1)*index;
-        childX=x-spacing
+        node.fx=node.fx-spacing*index;
+        childX=node.fx
       }
       nodeHierarchy[node.id].forEach((child, index) => {
         positionNodes(findNode(child), childX, childY, level + 1, index);
