@@ -227,9 +227,9 @@ class DAFSA {
 
   createDirectedGraph() {
     machine.innerHTML = "";
-    let nodeHierarchy={
-      'start':['q0']
-    }
+    let nodeHierarchy = {
+      start: ["q0"],
+    };
     let nodes = [{ id: "start" }];
     let links = [{ source: "start", target: "q0" }];
     let symbols = ["~"];
@@ -237,7 +237,7 @@ class DAFSA {
       `M${d.source.x},${d.source.y}A0,0 0 0,1 ${d.target.x},${d.target.y}`;
     for (const v of Object.keys(this.states)) {
       nodes.push({ id: v.toString() });
-      nodeHierarchy[v]=[];
+      nodeHierarchy[v] = [];
       for (const edge of this.states[v]) {
         links.push({ source: v.toString(), target: edge[0].toString() });
         nodeHierarchy[v].push(edge[0]);
@@ -247,7 +247,7 @@ class DAFSA {
     const color = d3.scaleOrdinal(symbols, d3.schemeCategory10); //creates different colors depending on symbol
     const width = machine.offsetWidth;
     const height = machine.offsetHeight;
-   
+
     const simulation = d3
       .forceSimulation(nodes)
       .force(
@@ -356,14 +356,8 @@ class DAFSA {
       .attr("stroke", "white")
       .attr("stroke-width", 3);
 
-    let spacing = 70; // Adjust spacing between nodes
-    let xOffset = -width / 3;
-    let yOffset = -height / 3;
-
-    // nodes.forEach((node, index) => {
-    //   node.fx = xOffset + (index % 1) * spacing;
-    //   node.fy = yOffset + Math.floor(index / 1) * spacing;
-    // });
+    let spacing = 80; // Adjust spacing between nodes
+    let fxyList = [];
     function findNode(name) {
       for (const node of nodes) {
         if (node.id === name) {
@@ -376,20 +370,28 @@ class DAFSA {
     function positionNodes(node, x, y, level, index) {
       node.fx = x;
       node.fy = y;
-    
+
       let childX = x + spacing;
       let childY = y + spacing;
-      if(index>0){
-        node.fx=node.fx-spacing*index;
-        childX=node.fx
+      if (index > 0) {
+        node.fx = node.fx - spacing * index;
+        childX = node.fx;
+        if (fxyList.includes([childX, childY])) {
+          console.log("here");
+          childX += spacing * 2; // Shift by a fixed amount (adjust as needed)
+          childY += spacing * 2;
+        }
       }
+
+      fxyList.push([childX, childY]);
+
       nodeHierarchy[node.id].forEach((child, index) => {
         positionNodes(findNode(child), childX, childY, level + 1, index);
       });
     }
-    
+
     // Initial node positioning
-    positionNodes(findNode('start'), -100, -200, 0, 0); // Start with root node and no parent coordinates
+    positionNodes(findNode("start"), -100, -200, 0, 0); // Start with root node and no parent coordinates
 
     // Start the simulation
     simulation.alpha(1).restart();
