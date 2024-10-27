@@ -370,6 +370,7 @@ class DAFSA {
 
     let spacing = 80; // Adjust spacing between nodes
     let fxyList = [];
+
     //finds node based off node name
     function findNode(name) {
       for (const node of nodes) {
@@ -379,6 +380,7 @@ class DAFSA {
       }
       return undefined;
     }
+
     //positions nodes in places depending on the parent and hierarchy
     function positionNodes(node, x, y, level, index) {
       node.fx = x; //sets x position of the node
@@ -390,11 +392,11 @@ class DAFSA {
         node.fx = node.fx - spacing * index;
         childX = node.fx;
       }
-      if (fxyList.includes([childX, childY])) { // checks if there is already a node in thise postition
-        childX += spacing * 2;
-        childY += spacing * 2;
+      if (fxyList.includes(childX+childY)) { // checks if there is already a node in thise postition
+        childX += spacing/level;
+        childY += spacing/level;
       }
-      fxyList.push([childX, childY]);
+      fxyList.push(childX+childY);
       //recursively calls to postition the children
       nodeHierarchy[node.id].forEach((child, index) => {
         positionNodes(findNode(child), childX, childY, level + 1, index);
