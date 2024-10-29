@@ -8,6 +8,7 @@ let emptyStringCheckBox = document.getElementById('emptyCheckbox')
 function createMachine() { //function to create DAFSA machine
   D.add_accepted_string(acceptedString.value);
   acceptedString.value = "";
+  D.minimize_dafsa();
   machine.appendChild(D.createDirectedGraph());
 }
 
