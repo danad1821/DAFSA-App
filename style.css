@@ -15,4 +15,5 @@
 #machine{
   width: 90dvw;
   height: 70dvh;
+  overflow-y: scroll;
 }

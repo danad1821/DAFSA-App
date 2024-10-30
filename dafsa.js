@@ -450,7 +450,103 @@ class DAFSA {
     return svg.node();
   }
 
-  minimize_dafsa(D) {
-    console.log("minimized machine");
+  minimize_dafsa() {
+    const heightMap = {};
+
+    // Helper function to calculate height of each state
+    const calculateHeight = (state) => {
+      if (heightMap[state] !== undefined) return heightMap[state];
+
+      let maxHeight = 0;
+      if (this.states[state]) {
+        for (const [nextState] of this.states[state]) {
+          maxHeight = Math.max(maxHeight, calculateHeight(nextState) + 1);
+        }
+      }
+      heightMap[state] = maxHeight;
+      return maxHeight;
+    };
+
+    // Calculate heights for all states
+    Object.keys(this.states).forEach((state) => calculateHeight(state));
+
+    // Group states by height
+    const heightGroups = {};
+    Object.entries(heightMap).forEach(([state, height]) => {
+      if (!heightGroups[height]) heightGroups[height] = [];
+      heightGroups[height].push(state);
+    });
+
+    // Minimize by merging states with the same height, type (final/non-final), and transition symbol
+    for (const height of Object.keys(heightGroups).sort((a, b) => b - a)) {
+      const statesAtHeight = heightGroups[height];
+
+      // Separate final and non-final states at the current height level
+      const finalStateGroups = {};
+      const nonFinalStateGroups = {};
+
+      for (const state of statesAtHeight) {
+        const isFinal = this.final_states.includes(state);
+        const transitionKey = this.states[state]
+          .map(([target, symbol]) => `${symbol}->${target}`)
+          .sort()
+          .join(",");
+
+        if (isFinal) {
+          if (!finalStateGroups[transitionKey])
+            finalStateGroups[transitionKey] = [];
+          finalStateGroups[transitionKey].push(state);
+        } else {
+          if (!nonFinalStateGroups[transitionKey])
+            nonFinalStateGroups[transitionKey] = [];
+          nonFinalStateGroups[transitionKey].push(state);
+        }
+      }
+
+      // For all heights, merge equivalent final and non-final states based on transition keys
+      for (const states of Object.values(finalStateGroups)) {
+        if (states.length > 1) {
+          const representative = states[0];
+          states
+            .slice(1)
+            .forEach((state) => this.mergeStates(representative, state));
+        }
+      }
+
+      for (const states of Object.values(nonFinalStateGroups)) {
+        if (states.length > 1) {
+          const representative = states[0];
+          states
+            .slice(1)
+            .forEach((state) => this.mergeStates(representative, state));
+        }
+      }
+    }
+  }
+
+  // Helper function to merge two states
+  mergeStates(representative, stateToRemove) {
+    // Redirect all incoming transitions to `stateToRemove` to `representative`
+    Object.keys(this.states).forEach((state) => {
+      this.states[state] = this.states[state].map(([target, symbol]) =>
+        target === stateToRemove ? [representative, symbol] : [target, symbol]
+      );
+    });
+
+    // Merge transitions of `stateToRemove` into `representative`
+    this.states[representative].push(...this.states[stateToRemove]);
+    this.states[representative] = Array.from(
+      new Set(this.states[representative].map(JSON.stringify)),
+      JSON.parse
+    ); // Remove duplicates
+    delete this.states[stateToRemove];
+
+    // Update final and non-final states lists
+    this.final_states = this.final_states.filter(
+      (state) => state !== stateToRemove
+    );
+    this.non_final_states = this.non_final_states.filter(
+      (state) => state !== stateToRemove
+    );
   }
 }
