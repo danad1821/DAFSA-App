@@ -12,7 +12,7 @@ class DAFSA {
     this.final_states = [];
     this.non_final_states = [];
     this.accepts_empty_string = false;
-    this.heights = {};
+    this.heightMap = {};
   }
   //adds an initial state
   add_initial_state(state) {
@@ -97,7 +97,7 @@ class DAFSA {
     }
   }
 
-  colorChange(color, curNodes){
+  colorChange(color, curNodes) {
     Array.from(curNodes).forEach((node) => {
       node.style.fill = color;
     });
@@ -107,19 +107,19 @@ class DAFSA {
     let curIndex = 0;
     let curNodes = document.getElementsByClassName(state.toString());
     if (curNodes.length > 0) {
-      if(this.final_states.includes(state)){
+      if (this.final_states.includes(state)) {
         setTimeout(() => {
-          this.colorChange("green", curNodes)
+          this.colorChange("green", curNodes);
           curIndex += 1;
         }, 5000 * curIndex);
-      }else{
+      } else {
         setTimeout(() => {
-          this.colorChange("red", curNodes)
+          this.colorChange("red", curNodes);
           curIndex += 1;
         }, 5000 * curIndex);
       }
       setTimeout(() => {
-        this.colorChange("white", curNodes)
+        this.colorChange("white", curNodes);
       }, 20000);
     }
   }
@@ -244,7 +244,8 @@ class DAFSA {
     let symbols = ["~"]; // symbols used for transitions
     let linkArc = (d) =>
       `M${d.source.x},${d.source.y}A0,0 0 0,1 ${d.target.x},${d.target.y}`; //function to create the arrow head shape
-    for (const v of Object.keys(this.states)) { //goes through the directed graph to collect all nodes, links and symbols 
+    for (const v of Object.keys(this.states)) {
+      //goes through the directed graph to collect all nodes, links and symbols
       //also used to create the hierarchy
       nodes.push({ id: v.toString() });
       nodeHierarchy[v] = [];
@@ -296,11 +297,11 @@ class DAFSA {
     //create links and adds them to svg
     const link = svg
       .append("g") // g is a tag specific to the d3.js library
-      .attr("fill", "none") 
-      .attr("stroke-width", 1.5) //the width of the links 
-      .attr("class", "linkLabel") //gives them a class 
+      .attr("fill", "none")
+      .attr("stroke-width", 1.5) //the width of the links
+      .attr("class", "linkLabel") //gives them a class
       .selectAll("path")
-      .data(links) 
+      .data(links)
       .join("path")
       .attr("stroke", (d) => color(symbols[links.indexOf(d)])) // determines the color of the arrow by the input symbol
       .attr(
@@ -317,9 +318,9 @@ class DAFSA {
       .attr("filter", "url(#solid)")
       .text(function (d) {
         return symbols[links.indexOf(d)];
-      });  
+      });
     linkLabelContainer.exit().remove();
-    
+
     //create nodes
     const node = svg
       .append("g")
@@ -388,15 +389,17 @@ class DAFSA {
       // changes the postion for the child
       let childX = x + spacing;
       let childY = y + spacing;
-      if (index > 0) { // if the parent has multiple children in the hierarchy than adjust spacing
+      if (index > 0) {
+        // if the parent has multiple children in the hierarchy than adjust spacing
         node.fx = node.fx - spacing * index;
         childX = node.fx;
       }
-      if (fxyList.includes(childX+childY)) { // checks if there is already a node in thise postition
-        childX += spacing/level;
-        childY += spacing/level;
+      if (fxyList.includes(childX + childY)) {
+        // checks if there is already a node in thise postition
+        childX += spacing / level;
+        childY += spacing / level;
       }
-      fxyList.push(childX+childY);
+      fxyList.push(childX + childY);
       //recursively calls to postition the children
       nodeHierarchy[node.id].forEach((child, index) => {
         positionNodes(findNode(child), childX, childY, level + 1, index);
@@ -449,86 +452,113 @@ class DAFSA {
     return svg.node();
   }
 
-  minimize_dafsa() {
-    const heightMap = {};
+  // Calculate heights of states
+  calculateHeights(state) {
+    if (this.heightMap[state] !== undefined) return this.heightMap[state];
 
-    // Helper function to calculate height of each state
-    const calculateHeight = (state) => {
-      if (heightMap[state] !== undefined) return heightMap[state];
-
-      let maxHeight = 0;
-      if (this.states[state]) {
-        for (const [nextState] of this.states[state]) {
-          maxHeight = Math.max(maxHeight, calculateHeight(nextState) + 1);
-        }
+    let maxHeight = 0;
+    if (this.states[state]) {
+      for (const [nextState] of this.states[state]) {
+        maxHeight = Math.max(maxHeight, this.calculateHeights(nextState) + 1);
       }
-      heightMap[state] = maxHeight;
-      return maxHeight;
-    };
+    }
+    this.heightMap[state] = maxHeight;
+    return maxHeight;
+  }
 
-    // Calculate heights for all states
-    Object.keys(this.states).forEach((state) => calculateHeight(state));
-
-    // Group states by height
+  // Group states by height
+  groupByHeight() {
     const heightGroups = {};
-    Object.entries(heightMap).forEach(([state, height]) => {
+    Object.entries(this.heightMap).forEach(([state, height]) => {
       if (!heightGroups[height]) heightGroups[height] = [];
       heightGroups[height].push(state);
     });
+    return heightGroups;
+  }
 
-    // Minimize by merging states with the same height, type (final/non-final), and transition symbol
-    for (const height of Object.keys(heightGroups).sort((a, b) => b - a)) {
-      const statesAtHeight = heightGroups[height];
+  minimize_dafsa() {
+    Object.keys(this.states).forEach((state) => this.calculateHeights(state));
+    const heightGroups = this.groupByHeight();
 
-      // Separate final and non-final states at the current height level
-      const finalStateGroups = {};
-      const nonFinalStateGroups = {};
+    // Minimize each height level from root to leaves
+    Object.keys(heightGroups)
+      .sort((a, b) => a - b) // Sort in ascending order
+      .forEach((height) => {
+        const statesAtHeight = heightGroups[height];
 
-      for (const state of statesAtHeight) {
-        const isFinal = this.final_states.includes(state);
-        const transitionKey = this.states[state]
-          .map(([target, symbol]) => `${symbol}->${target}`)
-          .sort()
-          .join(",");
+        // Separate final and non-final states at this height level
+        const finalStateGroups = {};
+        const nonFinalStateGroups = {};
 
-        if (isFinal) {
-          if (!finalStateGroups[transitionKey])
-            finalStateGroups[transitionKey] = [];
-          finalStateGroups[transitionKey].push(state);
-        } else {
-          if (!nonFinalStateGroups[transitionKey])
-            nonFinalStateGroups[transitionKey] = [];
-          nonFinalStateGroups[transitionKey].push(state);
+        for (const state of statesAtHeight) {
+          const isFinal = this.final_states.includes(state);
+
+          // Simplified key for non-final states (ignoring symbols)
+          const transitionKey = isFinal
+            ? this.states[state]
+                .map(([target, symbol]) => `${symbol}->${target}`)
+                .sort()
+                .join(",")
+            : this.states[state]
+                .map(([target]) => `${target}`)
+                .sort()
+                .join(",");
+
+          if (isFinal) {
+            if (!finalStateGroups[transitionKey])
+              finalStateGroups[transitionKey] = [];
+            finalStateGroups[transitionKey].push(state);
+          } else {
+            if (!nonFinalStateGroups[transitionKey])
+              nonFinalStateGroups[transitionKey] = [];
+            nonFinalStateGroups[transitionKey].push(state);
+          }
         }
-      }
 
-      // For all heights, merge equivalent final and non-final states based on transition keys
-      for (const states of Object.values(finalStateGroups)) {
-        if (states.length > 1) {
-          const representative = states[0];
-          states
-            .slice(1)
-            .forEach((state) => this.mergeStates(representative, state));
+        // Merge equivalent final states
+        for (const states of Object.values(finalStateGroups)) {
+          if (states.length > 1) {
+            const representative = states[0];
+            states
+              .slice(1)
+              .forEach((state) => this.mergeStates(representative, state));
+          }
         }
-      }
 
-      for (const states of Object.values(nonFinalStateGroups)) {
-        if (states.length > 1) {
-          const representative = states[0];
-          states
-            .slice(1)
-            .forEach((state) => this.mergeStates(representative, state));
+        // Merge equivalent non-final states
+        for (const states of Object.values(nonFinalStateGroups)) {
+          if (states.length > 1) {
+            const representative = states[0];
+            states
+              .slice(1)
+              .forEach((state) => this.mergeStates(representative, state));
+          }
         }
-      }
-    }
+      });
   }
 
   // Helper function to merge two states
   mergeStates(representative, stateToRemove) {
     // Redirect all incoming transitions to `stateToRemove` to `representative`
     Object.keys(this.states).forEach((state) => {
-      this.states[state] = this.states[state].map(([target, symbol]) =>
-        target === stateToRemove ? [representative, symbol] : [target, symbol]
+      const updatedTransitions = {};
+
+      this.states[state].forEach(([target, symbol]) => {
+        if (target === stateToRemove) {
+          if (!updatedTransitions[representative])
+            updatedTransitions[representative] = [];
+          updatedTransitions[representative].push(symbol);
+        } else {
+          if (!updatedTransitions[target]) updatedTransitions[target] = [];
+          updatedTransitions[target].push(symbol);
+        }
+      });
+
+      this.states[state] = Object.entries(updatedTransitions).map(
+        ([target, symbols]) => [
+          target,
+          symbols.join(", "), // Combine symbols into a single string if needed
+        ]
       );
     });
 
@@ -537,10 +567,9 @@ class DAFSA {
     this.states[representative] = Array.from(
       new Set(this.states[representative].map(JSON.stringify)),
       JSON.parse
-    ); // Remove duplicates
+    );
     delete this.states[stateToRemove];
 
-    // Update final and non-final states lists
     this.final_states = this.final_states.filter(
       (state) => state !== stateToRemove
     );
