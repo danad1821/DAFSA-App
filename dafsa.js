@@ -276,6 +276,7 @@ class DAFSA {
       .create("svg")
       .attr("viewBox", [-width / 2, -height / 2, width, height]); //create the svg that will contain the force simulayion
 
+      
     // Per-type markers, as they don't inherit styles.
     svg
       .append("defs")
