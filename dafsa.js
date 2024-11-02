@@ -13,6 +13,7 @@ class DAFSA {
     this.non_final_states = [];
     this.accepts_empty_string = false;
     this.heights = {};
+    this.history = []; //to store added strings
   }
   //adds an initial state
   add_initial_state(state) {
@@ -97,7 +98,7 @@ class DAFSA {
     }
   }
 
-  colorChange(color, curNodes){
+  colorChange(color, curNodes) {
     Array.from(curNodes).forEach((node) => {
       node.style.fill = color;
     });
@@ -107,12 +108,12 @@ class DAFSA {
     let curIndex = 0;
     let curNodes = document.getElementsByClassName(state.toString());
     if (curNodes.length > 0) {
-      if(this.final_states.includes(state)){
+      if (this.final_states.includes(state)) {
         setTimeout(() => {
           this.colorChange("green", curNodes)
           curIndex += 1;
         }, 5000 * curIndex);
-      }else{
+      } else {
         setTimeout(() => {
           this.colorChange("red", curNodes)
           curIndex += 1;
@@ -211,6 +212,36 @@ class DAFSA {
       this.add_final_state("q" + n);
       this.add_edge(currentState, "q" + n, s[slen - 1]);
     }
+
+    // Add the string to the history and display it
+    this.history.push(s);
+    this.updateHistoryDisplay();
+  }
+
+  updateHistoryDisplay() {
+    const historyList = document.getElementById("history-list");
+    historyList.innerHTML = ""; // Clear current history
+    this.history.forEach((str) => {
+      const listItem = document.createElement("li");
+      listItem.textContent = str;
+
+      // Create Remove button
+      const removeButton = document.createElement("button");
+      removeButton.textContent = "Remove";
+      // removeButton.onclick = () => this.remove_accepted_string(str);
+
+      removeButton.onclick = () => {
+        if (this.remove_accepted_string(str)) {
+          this.updateHistoryDisplay(); // Refresh the display after removal
+        } else {
+          alert("Could not remove the string from the machine.");
+        }
+      };
+
+      // Add string and button to list item
+      listItem.appendChild(removeButton);
+      historyList.appendChild(listItem);
+    });
   }
 
   get_states() {
@@ -218,20 +249,78 @@ class DAFSA {
     return this.states;
   }
 
+  // remove_accepted_string(s) {
+  //   if (this.isAccepted(s)) {
+  //     let currentState = this.initial_state;
+  //     for (let index = 0; index < s.length; index++) {
+  //       for (const v of this.states[currentState]) {
+  //         if (v[1] === s[index]) {
+  //           currentState = v[0];
+  //           break;
+  //         }
+  //       }
+  //     }
+  //   } else {
+  //     return false;
+  //   }
+  // }
+
   remove_accepted_string(s) {
-    if (this.isAccepted(s)) {
-      let currentState = this.initial_state;
-      for (let index = 0; index < s.length; index++) {
-        for (const v of this.states[currentState]) {
-          if (v[1] === s[index]) {
-            currentState = v[0];
-            break;
-          }
+    // Ensure the string is in the machine and can be removed
+    if (!this.history.includes(s)) {
+      return false; // String is not in history, cannot be removed
+    }
+
+    let currentState = this.initial_state;
+    let previousState = null;
+    let path = []; // Track the path of states and characters
+
+    // Traverse and record each state and transition used by the string
+    for (const character of s) {
+      let foundTransition = false; // Track if a valid transition is found
+      for (const edge of this.states[currentState]) {
+        if (edge[1] === character) {
+          previousState = currentState;
+          currentState = edge[0];
+          path.push({ previousState, currentState, character });
+          foundTransition = true; // A transition was found
+          break;
         }
       }
-    } else {
-      return false;
+      if (!foundTransition) {
+        return false; // If no transition found, the string cannot be removed
+      }
     }
+
+    // Convert final state to non-final state if necessary
+    if (this.final_states.includes(currentState)) {
+      this.final_to_non_final_conversion(currentState);
+    }
+
+    // Backtrack to remove transitions and orphaned states
+    for (let i = path.length - 1; i >= 0; i--) {
+      const { previousState, currentState, character } = path[i];
+
+      // Remove the transition from `previousState` to `currentState`
+      this.states[previousState] = this.states[previousState].filter(
+        (edge) => edge[0] !== currentState || edge[1] !== character
+      );
+
+      // If `currentState` has no incoming or outgoing transitions, delete it
+      if (this.states[currentState] && this.states[currentState].length === 0) {
+        delete this.states[currentState];
+        this.final_states = this.final_states.filter((state) => state !== currentState);
+        this.non_final_states = this.non_final_states.filter((state) => state !== currentState);
+      }
+    }
+
+    // Update history to remove the string and refresh the display
+    this.history = this.history.filter((str) => str !== s);
+    this.updateHistoryDisplay();
+
+
+
+    return true; // String successfully removed
   }
 
   createDirectedGraph() {
@@ -296,11 +385,11 @@ class DAFSA {
     //create links and adds them to svg
     const link = svg
       .append("g") // g is a tag specific to the d3.js library
-      .attr("fill", "none") 
+      .attr("fill", "none")
       .attr("stroke-width", 1.5) //the width of the links 
       .attr("class", "linkLabel") //gives them a class 
       .selectAll("path")
-      .data(links) 
+      .data(links)
       .join("path")
       .attr("stroke", (d) => color(symbols[links.indexOf(d)])) // determines the color of the arrow by the input symbol
       .attr(
@@ -317,9 +406,9 @@ class DAFSA {
       .attr("filter", "url(#solid)")
       .text(function (d) {
         return symbols[links.indexOf(d)];
-      });  
+      });
     linkLabelContainer.exit().remove();
-    
+
     //create nodes
     const node = svg
       .append("g")
@@ -392,11 +481,11 @@ class DAFSA {
         node.fx = node.fx - spacing * index;
         childX = node.fx;
       }
-      if (fxyList.includes(childX+childY)) { // checks if there is already a node in thise postition
-        childX += spacing/level;
-        childY += spacing/level;
+      if (fxyList.includes(childX + childY)) { // checks if there is already a node in thise postition
+        childX += spacing / level;
+        childY += spacing / level;
       }
-      fxyList.push(childX+childY);
+      fxyList.push(childX + childY);
       //recursively calls to postition the children
       nodeHierarchy[node.id].forEach((child, index) => {
         positionNodes(findNode(child), childX, childY, level + 1, index);
