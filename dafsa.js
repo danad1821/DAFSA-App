@@ -328,10 +328,10 @@ class DAFSA {
   createDirectedGraph() {
     machine.innerHTML = ""; //clears the machine
     let nodeHierarchy = {
-      start: ["q0"],
+      start: [],
     }; // later used for structuring the graph
     let nodes = [{ id: "start" }]; // all the nodes (states) of the graph
-    let links = [{ source: "start", target: "q0" }]; // the links (arrows) connecting the nodes
+    let links = []; // the links (arrows) connecting the nodes
     let symbols = ["~"]; // symbols used for transitions
     let linkArc = (d) =>
       `M${d.source.x},${d.source.y}A0,0 0 0,1 ${d.target.x},${d.target.y}`; //function to create the arrow head shape
@@ -339,6 +339,10 @@ class DAFSA {
       //goes through the directed graph to collect all nodes, links and symbols
       //also used to create the hierarchy
       nodes.push({ id: v.toString() });
+      if (links.length == 0) {
+        links.push({ source: "start", target: v.toString() });
+        nodeHierarchy["start"].push(v.toString());
+      }
       nodeHierarchy[v] = [];
       for (const edge of this.states[v]) {
         links.push({ source: v.toString(), target: edge[0].toString() });
@@ -409,9 +413,9 @@ class DAFSA {
       .attr("filter", "url(#solid)")
       .text(function (d) {
         return symbols[links.indexOf(d)];
-      });  
+      });
     linkLabelContainer.exit().remove();
-    
+
     //create nodes
     const node = svg
       .append("g")
@@ -485,7 +489,8 @@ class DAFSA {
         node.fx = node.fx - spacing * index;
         childX = node.fx;
       }
-      if (fxyList.includes(childX + childY)) { // checks if there is already a node in thise postition
+      if (fxyList.includes(childX + childY)) {
+        // checks if there is already a node in thise postition
         childX += spacing / level;
         childY += spacing / level;
       }
@@ -567,8 +572,9 @@ class DAFSA {
   }
 
   minimize_dafsa() {
-    Object.keys(this.states).forEach((state) => this.calculateHeights(state));
-    const heightGroups = this.groupByHeight();
+    D = this;
+    Object.keys(D.states).forEach((state) => D.calculateHeights(state));
+    const heightGroups = D.groupByHeight();
 
     // Minimize each height level from root to leaves
     Object.keys(heightGroups)
@@ -576,20 +582,20 @@ class DAFSA {
       .forEach((height) => {
         const statesAtHeight = heightGroups[height];
 
-        // Separate final and non-final states at this height level
+        // Separate final and non-final states at D height level
         const finalStateGroups = {};
         const nonFinalStateGroups = {};
 
         for (const state of statesAtHeight) {
-          const isFinal = this.final_states.includes(state);
+          const isFinal = D.final_states.includes(state);
 
           // Simplified key for non-final states (ignoring symbols)
           const transitionKey = isFinal
-            ? this.states[state]
+            ? D.states[state]
                 .map(([target, symbol]) => `${symbol}->${target}`)
                 .sort()
                 .join(",")
-            : this.states[state]
+            : D.states[state]
                 .map(([target]) => `${target}`)
                 .sort()
                 .join(",");
@@ -611,7 +617,7 @@ class DAFSA {
             const representative = states[0];
             states
               .slice(1)
-              .forEach((state) => this.mergeStates(representative, state));
+              .forEach((state) => D.mergeStates(representative, state));
           }
         }
 
@@ -621,10 +627,11 @@ class DAFSA {
             const representative = states[0];
             states
               .slice(1)
-              .forEach((state) => this.mergeStates(representative, state));
+              .forEach((state) => D.mergeStates(representative, state));
           }
         }
       });
+    return D;
   }
 
   // Helper function to merge two states
