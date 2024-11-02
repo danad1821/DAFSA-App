@@ -589,13 +589,7 @@ class DAFSA {
         for (const state of statesAtHeight) {
           const isFinal = D.final_states.includes(state);
 
-          // Simplified key for non-final states (ignoring symbols)
-          const transitionKey = isFinal
-            ? D.states[state]
-                .map(([target, symbol]) => `${symbol}->${target}`)
-                .sort()
-                .join(",")
-            : D.states[state]
+          const transitionKey = D.states[state]
                 .map(([target]) => `${target}`)
                 .sort()
                 .join(",");
@@ -631,6 +625,7 @@ class DAFSA {
           }
         }
       });
+      
     return D;
   }
 
