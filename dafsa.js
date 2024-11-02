@@ -398,10 +398,24 @@ class DAFSA {
       .selectAll("path")
       .data(links)
       .join("path")
-      .attr("stroke", (d) => color(symbols[links.indexOf(d)])) // determines the color of the arrow by the input symbol
+      .attr("stroke", (d) => {
+        let sym = symbols[links.indexOf(d)];
+        if (sym.length > 1) {
+          return color("`");
+        } else {
+          return color(sym);
+        }
+      }) // determines the color of the arrow by the input symbol
       .attr(
         "marker-end",
-        (d) => `url(#arrow-${symbols[links.indexOf(d)]})` // Access symbol by index
+        (d) => {
+          let sym = symbols[links.indexOf(d)];
+          if (sym.length > 1) {
+            sym = "`";
+          }
+          return `url(#arrow-${sym})`;
+        }
+        // Access symbol by index
       ); // gets the tip of the arrow based off the input symbol
     const linkLabelContainer = svg.selectAll(".linkLabel").data(links); // a container of the labels of the links
     //creates the text that is placed on the link
@@ -572,9 +586,17 @@ class DAFSA {
   }
 
   minimize_dafsa() {
-    D = this;
-    Object.keys(D.states).forEach((state) => D.calculateHeights(state));
-    const heightGroups = D.groupByHeight();
+    let newDafsa = new DAFSA();
+
+    // Deep copy the current DAFSA to newDafsa
+    Object.assign(newDafsa, this);
+    newDafsa.states = JSON.parse(JSON.stringify(this.states));
+    newDafsa.final_states = [...this.final_states];
+
+    Object.keys(newDafsa.states).forEach((state) =>
+      newDafsa.calculateHeights(state)
+    );
+    const heightGroups = newDafsa.groupByHeight();
 
     // Minimize each height level from root to leaves
     Object.keys(heightGroups)
@@ -587,12 +609,12 @@ class DAFSA {
         const nonFinalStateGroups = {};
 
         for (const state of statesAtHeight) {
-          const isFinal = D.final_states.includes(state);
+          const isFinal = newDafsa.final_states.includes(state);
 
-          const transitionKey = D.states[state]
-                .map(([target]) => `${target}`)
-                .sort()
-                .join(",");
+          const transitionKey = newDafsa.states[state]
+            .map(([target]) => `${target}`)
+            .sort()
+            .join(", ");
 
           if (isFinal) {
             if (!finalStateGroups[transitionKey])
@@ -611,7 +633,7 @@ class DAFSA {
             const representative = states[0];
             states
               .slice(1)
-              .forEach((state) => D.mergeStates(representative, state));
+              .forEach((state) => newDafsa.mergeStates(representative, state));
           }
         }
 
@@ -621,12 +643,12 @@ class DAFSA {
             const representative = states[0];
             states
               .slice(1)
-              .forEach((state) => D.mergeStates(representative, state));
+              .forEach((state) => newDafsa.mergeStates(representative, state));
           }
         }
       });
-      
-    return D;
+
+    return newDafsa;
   }
 
   // Helper function to merge two states
