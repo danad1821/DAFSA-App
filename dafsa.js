@@ -401,7 +401,7 @@ class DAFSA {
       .attr("stroke", (d) => {
         let sym = symbols[links.indexOf(d)];
         if (sym.length > 1) {
-          return color("`");
+          return color("~");
         } else {
           return color(sym);
         }
@@ -411,7 +411,7 @@ class DAFSA {
         (d) => {
           let sym = symbols[links.indexOf(d)];
           if (sym.length > 1) {
-            sym = "`";
+            sym = symbols[0];
           }
           return `url(#arrow-${sym})`;
         }
