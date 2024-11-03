@@ -224,10 +224,11 @@ class DAFSA {
     this.history.forEach((str) => {
       const listItem = document.createElement("li");
       listItem.textContent = str;
-
+      listItem.className='stringAdded'
       // Create Remove button
       const removeButton = document.createElement("button");
       removeButton.textContent = "Remove";
+      removeButton.className="removeBtn"
       // removeButton.onclick = () => this.remove_accepted_string(str);
 
       removeButton.onclick = () => {
@@ -521,7 +522,6 @@ class DAFSA {
     // Start the simulation
     simulation.alpha(1).restart();
 
-    node.on("click", (e, d) => console.log(nodes[d.index]));
     //for when the simulation starts to make sure the placement of the connections are correct
     simulation.on("tick", () => {
       link.attr("d", linkArc);
@@ -536,6 +536,7 @@ class DAFSA {
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;
       event.fixed = true;
+      machine.style.cursor="grabbing"
     }
 
     // Update the dragged node position during drag.
@@ -554,6 +555,7 @@ class DAFSA {
       event.subject.fy = event.y;
       if (event.x < 0 || event.x > width || event.y < 0 || event.y > height)
         event.fixed = false;
+      machine.style.cursor="grab"
     }
     //returns the svg
     let sv = document.createElement("svg");

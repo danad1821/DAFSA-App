@@ -1,19 +1,65 @@
-.state {
-  border: 1px solid black;
-  border-radius: 100%;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 15px;
+*{
+  margin: 0;
+  padding: 0;
 }
-.finalState {
-  border-style: double;
-  border-width: 5px;
+h1{
+  padding: 20px;
+  margin: 20px;
+  text-align: center;
+  border-radius: 12px;
+  background-color: blueviolet;
+  color: white;
+}
+.mainFunctions{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 50px;
+  flex-wrap: wrap;
+}
+.mainFuntionInput{
+  border: 1px solid black;
+  border-radius: 50px;
+  font-size: 20px;
+  min-width: 200px;
+}
+.mainFuntionInput input{
+  border: none;
+  padding: 20px;
+  border-radius: 50px;
+  min-width: 150px;
+  outline: none;
+}
+.mainFuntionInput button{
+  padding: 20px;
+  border-radius: 50px;
+  border: none;
+  margin: 3px;
+  min-width: 80px;
+}
+.mainContent{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+.mainContent>div{
+  border-radius: 12px;
+  border: 1px solid black;
+}
+.mainContent>div:first-child{
+  overflow: scroll;
 }
 #machine{
-  width: 90dvw;
+  width: 70dvw;
   height: 70dvh;
-  overflow-y: scroll;
+  cursor: grab;
+}
+.stringAdded{
+  list-style: none;
+  display: flex;
+  border-radius: 12px;
+  background-color: lightgray;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
 }

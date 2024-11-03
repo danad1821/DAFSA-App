@@ -10,6 +10,7 @@ function createMachine() { //function to create DAFSA machine
   D.add_accepted_string(acceptedString.value);
   acceptedString.value = "";
   machine.appendChild(D.createDirectedGraph());
+  M=D.minimize_dafsa()
 }
 
 addBtn.addEventListener("click", createMachine);
@@ -47,13 +48,6 @@ emptyStringCheckBox.addEventListener('change', () => {
   }
 })
 
-let removeBtn = document.getElementById('removeBtn');
-removeBtn.addEventListener('click', () => {
-  let removeText = document.getElementById('removeText');
-  console.log(D.remove_accepted_string(removeText.value));
-  machine.appendChild(D.createDirectedGraph());
-})
-
 function downloadGraphAsImage() {
   const svgElement = document.querySelector("#machine");
   const format = document.getElementById("format").value;
@@ -72,6 +66,6 @@ function downloadGraphAsImage() {
 }
 
 document.getElementById("mini").addEventListener("click", ()=>{
-  M=D.minimize_dafsa()
+  
   machine.appendChild(M.createDirectedGraph());
 })

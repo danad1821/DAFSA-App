@@ -9,26 +9,19 @@
 </head>
 
 <body>
-  <div>
-    <label for="acceptedString">Add an Accepted String</label>
-    <input type="text" placeholder="Type here to add an accepted string" name="acceptedString" id="acceptedString" />
-    <button id="addBtn">Add</button>
-  </div>
-  <div>
-    <label for="search">Search</label>
-    <input type="text" placeholder="Type here to search for an accepted string" name="search" id="searchText" />
-    <button id="searchBtn">Search</button>
-  </div>
-  <div>
-    <label for="remove">remove</label>
-    <input type="text" placeholder="Type here to remove for an accepted string" name="remove" id="removeText" />
-    <button id="removeBtn">remove</button>
+  <h1>DAFSA Machine Tester</h1>
+  <div class="mainFunctions">
+    <div class="mainFuntionInput">
+      <input type="text" placeholder="Type a string to add to the machine" name="acceptedString" id="acceptedString" />
+      <button id="addBtn">Add</button>
+    </div>
+    <div class="mainFuntionInput">
+      <input type="text" placeholder="Type string to search for" name="search" id="searchText" />
+      <button id="searchBtn">Search</button>
+    </div>
   </div>
   <button id="resetBtn">Reset Machine</button>
-  <div>
-    <input type="checkbox" name="emptyString" id="emptyCheckbox" />
-    <label for="emptyString">Accepts Empty String</label>
-  </div>
+  
   <button id="mini">Minimize</button>
   <label for="format">Select format:</label>
   <select id="format">
@@ -37,14 +30,21 @@
   </select>
   <button onclick="downloadGraphAsImage()">Download Graph as Image</button>
 
-
-  <div id="history">
-    <h2>Added Strings History</h2>
-    <ul id="history-list"></ul>
+  <div class="mainContent">
+    <div>
+      <div>
+        <input type="checkbox" name="emptyString" id="emptyCheckbox" />
+        <label for="emptyString">Accepts Empty String</label>
+      </div>
+      <div id="machine">
+      <!-- The Machine will be displayed here -->
+      </div>
+    </div>
+    <div id="history">
+      <h2>Added Strings History</h2>
+      <ul id="history-list"></ul>
+    </div>
   </div>
-
-  <div id="machine"></div>
-
 
   <div id="stateInformation"></div>
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
