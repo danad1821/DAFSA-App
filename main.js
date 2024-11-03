@@ -1,16 +1,28 @@
 let D = new DAFSA();
-let M=new DAFSA();
+let M = new DAFSA();
 
-let addBtn = document.getElementById('addBtn');
-let acceptedString = document.getElementById('acceptedString');
-let resetBtn = document.getElementById('resetBtn');
-let emptyStringCheckBox = document.getElementById('emptyCheckbox')
+let addBtn = document.getElementById("addBtn");
+let acceptedString = document.getElementById("acceptedString");
+let resetBtn = document.getElementById("resetBtn");
+let emptyStringCheckBox = document.getElementById("emptyCheckbox");
+let displayOptions = document.querySelectorAll(".toggle input[type=checkbox]");
+let colorDiv = document.querySelector(".toggle-color");
+let pos=0;
+let  id=null
 
-function createMachine() { //function to create DAFSA machine
+displayOptions[0].checked=true;
+
+function createMachine() {
+  //function to create DAFSA machine
   D.add_accepted_string(acceptedString.value);
   acceptedString.value = "";
-  machine.appendChild(D.createDirectedGraph());
-  M=D.minimize_dafsa()
+  M = D.minimize_dafsa();
+  if(displayOptions[0].checked){
+    machine.appendChild(D.createDirectedGraph());
+  }
+  else{
+    machine.appendChild(M.createDirectedGraph());
+  }
 }
 
 addBtn.addEventListener("click", createMachine);
@@ -22,14 +34,12 @@ acceptedString.addEventListener("keypress", function (event) {
   }
 });
 
-
-let searchBtn = document.getElementById('searchBtn');
+let searchBtn = document.getElementById("searchBtn");
 searchBtn.addEventListener("click", function () {
-  let searchText = document.getElementById('searchText');
+  let searchText = document.getElementById("searchText");
   let inMachine = D.isAccepted(searchText.value);
   searchText.value = "";
-})
-
+});
 
 function resetMachine() {
   D = new DAFSA();
@@ -38,25 +48,24 @@ function resetMachine() {
 
 resetBtn.addEventListener("click", resetMachine);
 
-emptyStringCheckBox.addEventListener('change', () => {
-  D.acceptance_of_empty_string(emptyStringCheckBox.checked)
+emptyStringCheckBox.addEventListener("change", () => {
+  D.acceptance_of_empty_string(emptyStringCheckBox.checked);
   if (emptyStringCheckBox.checked == true || Object.keys(D.states).length > 1) {
     machine.appendChild(D.createDirectedGraph());
-  }
-  else {
+  } else {
     machine.innerHTML = "";
   }
-})
+});
 
 function downloadGraphAsImage() {
   const svgElement = document.querySelector("#machine");
   const format = document.getElementById("format").value;
 
   html2canvas(svgElement, {
-    useCORS: true,    // Enables cross-origin images if any are used
-    scale: 2,         // Increases the resolution of the downloaded image
-    backgroundColor: "#ffffff" // Sets a white background
-  }).then(canvas => {
+    useCORS: true, // Enables cross-origin images if any are used
+    scale: 2, // Increases the resolution of the downloaded image
+    backgroundColor: "#ffffff", // Sets a white background
+  }).then((canvas) => {
     // Create a download link
     const link = document.createElement("a");
     link.download = `DAFSA-machine-image.${format}`;
@@ -65,7 +74,36 @@ function downloadGraphAsImage() {
   });
 }
 
-document.getElementById("mini").addEventListener("click", ()=>{
-  
-  machine.appendChild(M.createDirectedGraph());
-})
+function moveLeft() {
+  if (pos == 110) {
+    clearInterval(id);
+  } else {
+    pos++;
+    colorDiv.style.left = pos + "px";
+  }
+}
+function moveRight() {
+  if (pos == 0) {
+    clearInterval(id);
+  } else {
+    pos--;
+    colorDiv.style.left = pos + "px";
+  }
+}
+
+displayOptions[0].addEventListener("change", () => {
+  if (displayOptions[0].checked) {
+    displayOptions[1].checked = false;
+    clearInterval(id);
+    id = setInterval(moveRight, 8);
+    machine.appendChild(D.createDirectedGraph());
+  }
+});
+displayOptions[1].addEventListener("change", () => {
+  if (displayOptions[1].checked) {
+    displayOptions[0].checked = false;
+    clearInterval(id);
+    id = setInterval(moveLeft, 8);
+    machine.appendChild(M.createDirectedGraph());
+  }
+});

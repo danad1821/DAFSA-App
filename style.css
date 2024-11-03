@@ -49,10 +49,39 @@ h1{
 .mainContent>div:first-child{
   overflow: scroll;
 }
+.toggle{
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 50px;
+  width: 200px;
+  position: relative;
+}
+.toggle input[type=checkbox]{
+  display: none;
+}
+.toggle label{
+  text-align: center;
+}
+.toggle-color{
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: aqua;
+  border-radius: 50px;
+  width: 50%;
+  height: 100%;
+  z-index: -1;
+}
 #machine{
   width: 70dvw;
   height: 70dvh;
   cursor: grab;
+}
+#history-list{
+  display: flex;
+  flex-wrap: wrap;
 }
 .stringAdded{
   list-style: none;
@@ -62,4 +91,5 @@ h1{
   justify-content: space-between;
   align-items: center;
   padding: 5px;
+  margin: 5px;
 }

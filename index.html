@@ -1,56 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DAFSA</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DAFSA</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-
-<body>
-  <h1>DAFSA Machine Tester</h1>
-  <div class="mainFunctions">
-    <div class="mainFuntionInput">
-      <input type="text" placeholder="Type a string to add to the machine" name="acceptedString" id="acceptedString" />
-      <button id="addBtn">Add</button>
+  <body>
+    <h1>DAFSA Machine Tester</h1>
+    <div class="mainFunctions">
+      <div class="mainFuntionInput">
+        <input
+          type="text"
+          placeholder="Type a string to add to the machine"
+          name="acceptedString"
+          id="acceptedString"
+        />
+        <button id="addBtn">Add</button>
+      </div>
+      <div class="mainFuntionInput">
+        <input
+          type="text"
+          placeholder="Type string to search for"
+          name="search"
+          id="searchText"
+        />
+        <button id="searchBtn">Search</button>
+      </div>
     </div>
-    <div class="mainFuntionInput">
-      <input type="text" placeholder="Type string to search for" name="search" id="searchText" />
-      <button id="searchBtn">Search</button>
-    </div>
-  </div>
-  <button id="resetBtn">Reset Machine</button>
-  
-  <button id="mini">Minimize</button>
-  <label for="format">Select format:</label>
-  <select id="format">
-    <option value="png">PNG</option>
-    <option value="jpeg">JPEG</option>
-  </select>
-  <button onclick="downloadGraphAsImage()">Download Graph as Image</button>
+    <button id="resetBtn">Reset Machine</button>
 
-  <div class="mainContent">
-    <div>
+    <div class="mainContent">
       <div>
-        <input type="checkbox" name="emptyString" id="emptyCheckbox" />
-        <label for="emptyString">Accepts Empty String</label>
+        <div class="toggle">
+          <div class="toggle-color"></div>
+          <div>
+            <input type="checkbox" name="expanded" id="expanded" />
+            <label for="expanded">Expanded</label>
+          </div>
+          <div>
+            <input type="checkbox" name="minimized" id="minimized" />
+            <label for="minimized">Minimized</label>
+          </div>
+        </div>
+        <div>
+          <input type="checkbox" name="emptyString" id="emptyCheckbox" />
+          <label for="emptyString">Accepts Empty String</label>
+        </div>
+        <div id="machine">
+          <!-- The Machine will be displayed here -->
+        </div>
+        <label for="format">Select format:</label>
+        <select id="format">
+          <option value="png">PNG</option>
+          <option value="jpeg">JPEG</option>
+        </select>
+        <button onclick="downloadGraphAsImage()">
+          Download Graph as Image
+        </button>
       </div>
-      <div id="machine">
-      <!-- The Machine will be displayed here -->
+      <div id="history">
+        <h2>Added Strings History</h2>
+        <ul id="history-list"></ul>
       </div>
     </div>
-    <div id="history">
-      <h2>Added Strings History</h2>
-      <ul id="history-list"></ul>
-    </div>
-  </div>
 
-  <div id="stateInformation"></div>
-  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-  <script src="dafsa.js"></script>
-  <script src="main.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-</body>
-
+    <div id="stateInformation"></div>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="dafsa.js"></script>
+    <script src="main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  </body>
 </html>
