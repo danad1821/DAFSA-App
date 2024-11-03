@@ -7,7 +7,7 @@ h1{
   margin: 20px;
   text-align: center;
   border-radius: 12px;
-  background-color: blueviolet;
+  background: linear-gradient(to right, #ADBADA, #7191E6);
   color: white;
 }
 .mainFunctions{
@@ -18,10 +18,11 @@ h1{
   flex-wrap: wrap;
 }
 .mainFuntionInput{
-  border: 1px solid black;
+  border: 1px solid #3D52A1;
   border-radius: 50px;
   font-size: 20px;
   min-width: 200px;
+  background-color: #ADBADA;
 }
 .mainFuntionInput input{
   border: none;
@@ -29,6 +30,8 @@ h1{
   border-radius: 50px;
   min-width: 150px;
   outline: none;
+  background: none;
+  color: white;
 }
 .mainFuntionInput button{
   padding: 20px;
@@ -36,11 +39,18 @@ h1{
   border: none;
   margin: 3px;
   min-width: 80px;
+  background-color: #3D52A1;
+  color: white;
+  font-size: 17px;
+}
+.mainFuntionInput input::placeholder{
+  color: white;
 }
 .mainContent{
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+  flex-wrap: wrap;
 }
 .mainContent>div{
   border-radius: 12px;
@@ -49,29 +59,39 @@ h1{
 .mainContent>div:first-child{
   overflow: scroll;
 }
+.machineContent{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
 .toggle{
   display: flex;
   justify-content: space-around;
   padding: 10px;
-  border: 1px solid black;
   border-radius: 50px;
   width: 200px;
   position: relative;
+  background-color: #3D52A1;
+  z-index: -1;
 }
 .toggle input[type=checkbox]{
   display: none;
+  z-index: 8;
 }
 .toggle label{
   text-align: center;
+  color: white;
+  /* z-index: 6; */
 }
 .toggle-color{
   position: absolute;
-  top: 0;
-  left: 0;
-  background-color: aqua;
+  top: 2px;
+  left: 4px;
+  background-color: #ADBADA;
   border-radius: 50px;
-  width: 50%;
-  height: 100%;
+  width: 48%;
+  height: 90%;
   z-index: -1;
 }
 #machine{

@@ -7,8 +7,8 @@ let resetBtn = document.getElementById("resetBtn");
 let emptyStringCheckBox = document.getElementById("emptyCheckbox");
 let displayOptions = document.querySelectorAll(".toggle input[type=checkbox]");
 let colorDiv = document.querySelector(".toggle-color");
-let pos=0;
-let  id=null
+let pos=5;
+let  id=null;
 
 displayOptions[0].checked=true;
 
@@ -83,7 +83,7 @@ function moveLeft() {
   }
 }
 function moveRight() {
-  if (pos == 0) {
+  if (pos == 5) {
     clearInterval(id);
   } else {
     pos--;
@@ -93,6 +93,7 @@ function moveRight() {
 
 displayOptions[0].addEventListener("change", () => {
   if (displayOptions[0].checked) {
+    console.log('here')
     displayOptions[1].checked = false;
     clearInterval(id);
     id = setInterval(moveRight, 8);
