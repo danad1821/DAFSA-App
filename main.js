@@ -93,10 +93,9 @@ function moveRight() {
 
 displayOptions[0].addEventListener("change", () => {
   if (displayOptions[0].checked) {
-    console.log('here')
     displayOptions[1].checked = false;
     clearInterval(id);
-    id = setInterval(moveRight, 8);
+    id = setInterval(moveRight, 5);
     machine.appendChild(D.createDirectedGraph());
   }
 });
@@ -104,7 +103,7 @@ displayOptions[1].addEventListener("change", () => {
   if (displayOptions[1].checked) {
     displayOptions[0].checked = false;
     clearInterval(id);
-    id = setInterval(moveLeft, 8);
+    id = setInterval(moveLeft, 5);
     machine.appendChild(M.createDirectedGraph());
   }
 });
