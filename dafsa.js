@@ -224,11 +224,11 @@ class DAFSA {
     this.history.forEach((str) => {
       const listItem = document.createElement("li");
       listItem.textContent = str;
-      listItem.className='stringAdded'
+      listItem.className = "stringAdded";
       // Create Remove button
       const removeButton = document.createElement("button");
       removeButton.textContent = "Remove";
-      removeButton.className="removeBtn"
+      removeButton.className = "removeBtn";
       // removeButton.onclick = () => this.remove_accepted_string(str);
 
       removeButton.onclick = () => {
@@ -536,7 +536,7 @@ class DAFSA {
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;
       event.fixed = true;
-      machine.style.cursor="grabbing"
+      machine.style.cursor = "grabbing";
     }
 
     // Update the dragged node position during drag.
@@ -555,7 +555,7 @@ class DAFSA {
       event.subject.fy = event.y;
       if (event.x < 0 || event.x > width || event.y < 0 || event.y > height)
         event.fixed = false;
-      machine.style.cursor="grab"
+      machine.style.cursor = "grab";
     }
     //returns the svg
     let sv = document.createElement("svg");
@@ -661,31 +661,44 @@ class DAFSA {
 
       this.states[state].forEach(([target, symbol]) => {
         if (target === stateToRemove) {
-          if (!updatedTransitions[representative])
-            updatedTransitions[representative] = [];
-          updatedTransitions[representative].push(symbol);
-        } else {
-          if (!updatedTransitions[target]) updatedTransitions[target] = [];
-          updatedTransitions[target].push(symbol);
+          target = representative; // Redirect transition to representative
         }
+
+        // Combine symbols on the same transition
+        if (!updatedTransitions[target]) {
+          updatedTransitions[target] = new Set();
+        }
+        updatedTransitions[target].add(symbol); // Use a Set to avoid duplicates
       });
 
+      // Convert each Set of symbols to a comma-separated string
       this.states[state] = Object.entries(updatedTransitions).map(
-        ([target, symbols]) => [
-          target,
-          symbols.join(", "), // Combine symbols into a single string if needed
-        ]
+        ([target, symbolsSet]) => [target, Array.from(symbolsSet).join(", ")]
       );
     });
 
     // Merge transitions of `stateToRemove` into `representative`
-    this.states[representative].push(...this.states[stateToRemove]);
+    const combinedTransitions = this.states[representative] || [];
+    this.states[stateToRemove].forEach(([target, symbol]) => {
+      const existing = combinedTransitions.find(([t]) => t === target);
+
+      if (existing) {
+        // Add new symbol to existing transition
+        const symbols = new Set(existing[1].split(", ").concat(symbol));
+        existing[1] = Array.from(symbols).join(", ");
+      } else {
+        // Add new transition if it doesn't already exist
+        combinedTransitions.push([target, symbol]);
+      }
+    });
+
+    // Remove duplicate transitions and update states
     this.states[representative] = Array.from(
-      new Set(this.states[representative].map(JSON.stringify)),
+      new Set(combinedTransitions.map(JSON.stringify)),
       JSON.parse
     );
-    delete this.states[stateToRemove];
 
+    delete this.states[stateToRemove];
     this.final_states = this.final_states.filter(
       (state) => state !== stateToRemove
     );
