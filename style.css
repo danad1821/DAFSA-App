@@ -2,6 +2,9 @@
   margin: 0;
   padding: 0;
 }
+body{
+  background-color: #F0EAF4;
+}
 h1{
   padding: 20px;
   margin: 20px;
@@ -28,7 +31,7 @@ h1{
   border: none;
   padding: 20px;
   border-radius: 50px;
-  min-width: 150px;
+  min-width: 210px;
   outline: none;
   background: none;
   color: white;
@@ -42,6 +45,7 @@ h1{
   background-color: #3D52A1;
   color: white;
   font-size: 17px;
+  min-width: 100px;
 }
 .mainFuntionInput input::placeholder{
   color: white;
@@ -49,15 +53,19 @@ h1{
 .mainContent{
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
-  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  /* flex-wrap: wrap; */
 }
 .mainContent>div{
   border-radius: 12px;
   border: 1px solid black;
+  padding: 10px;
+  margin: 10px;
+  background-color: white;
 }
 .mainContent>div:first-child{
-  overflow: scroll;
+  min-width: 40vw;
 }
 .machineContent{
   display: flex;
@@ -109,18 +117,22 @@ h1{
   width: 70dvw;
   height: 70dvh;
   cursor: grab;
+  overflow: scroll;
 }
 #history-list{
   display: flex;
   flex-wrap: wrap;
+  flex-direction: column;
 }
 .stringAdded{
   list-style: none;
   display: flex;
   border-radius: 12px;
-  background-color: lightgray;
+  background-color: #EEE8F6;
   justify-content: space-between;
   align-items: center;
   padding: 5px;
   margin: 5px;
+  min-width: 50px;
+  border: 1px solid #3D52A1;
 }

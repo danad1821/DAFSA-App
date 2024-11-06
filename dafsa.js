@@ -331,7 +331,7 @@ class DAFSA {
     let nodeHierarchy = {
       start: [],
     }; // later used for structuring the graph
-    let nodes = [{ id: "start" }]; // all the nodes (states) of the graph
+    let nodes = []; // all the nodes (states) of the graph
     let links = []; // the links (arrows) connecting the nodes
     let symbols = ["~"]; // symbols used for transitions
     let linkArc = (d) =>
@@ -341,6 +341,7 @@ class DAFSA {
       //also used to create the hierarchy
       nodes.push({ id: v.toString() });
       if (links.length == 0) {
+        nodes.push({ id: "start" })
         links.push({ source: "start", target: v.toString() });
         nodeHierarchy["start"].push(v.toString());
       }
