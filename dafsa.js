@@ -104,28 +104,26 @@ class DAFSA {
     });
   }
 
-  changeStateColor(state) {
-    let curIndex = 0;
+  changeStateColor(state, curIndex) {
     let curNodes = document.getElementsByClassName(state.toString());
     if (curNodes.length > 0) {
       if (this.final_states.includes(state)) {
         setTimeout(() => {
           this.colorChange("green", curNodes);
-          curIndex += 1;
-        }, 5000 * curIndex);
+        }, 500 * curIndex);
       } else {
         setTimeout(() => {
           this.colorChange("red", curNodes);
-          curIndex += 1;
-        }, 5000 * curIndex);
+        }, 500 * curIndex);
       }
       setTimeout(() => {
         this.colorChange("white", curNodes);
-      }, 20000);
+      }, 10000);
     }
   }
 
-  isAccepted(s) {
+  search(s) {
+    let curIndex = 0;
     //checks if a string is accepted by the machine
     let currentState = this.initial_state;
     for (const character of s) {
@@ -137,11 +135,13 @@ class DAFSA {
 
       let changeOccurred = false;
       for (const v of this.states[currentState]) {
-        if (v[1] === character) {
-          this.changeStateColor(currentState);
+        if (v[1] === character || v[1].includes(character)) {
+          this.changeStateColor(currentState, curIndex);
+          curIndex += 1;
           // sees if there is a transition on the current character
           currentState = v[0]; // changes the current state to the state it reaches
-          this.changeStateColor(currentState);
+          this.changeStateColor(currentState, curIndex);
+          curIndex += 1;
           changeOccurred = true; // changes the value of changeOccured since a change occured
           break;
         }
@@ -249,22 +249,6 @@ class DAFSA {
     //returns the object containing all the information about all states
     return this.states;
   }
-
-  // remove_accepted_string(s) {
-  //   if (this.isAccepted(s)) {
-  //     let currentState = this.initial_state;
-  //     for (let index = 0; index < s.length; index++) {
-  //       for (const v of this.states[currentState]) {
-  //         if (v[1] === s[index]) {
-  //           currentState = v[0];
-  //           break;
-  //         }
-  //       }
-  //     }
-  //   } else {
-  //     return false;
-  //   }
-  // }
 
   remove_accepted_string(s) {
     // Ensure the string is in the machine and can be removed

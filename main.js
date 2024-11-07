@@ -7,20 +7,19 @@ let resetBtn = document.getElementById("resetBtn");
 let emptyStringCheckBox = document.getElementById("emptyCheckbox");
 let displayOptions = document.querySelectorAll(".toggle input[type=checkbox]");
 let colorDiv = document.querySelector(".toggle-color");
-let pos=5;
-let  id=null;
+let pos = 5;
+let id = null;
 
-displayOptions[0].checked=true;
+displayOptions[0].checked = true;
 
 function createMachine() {
   //function to create DAFSA machine
   D.add_accepted_string(acceptedString.value);
   acceptedString.value = "";
   M = D.minimize_dafsa();
-  if(displayOptions[0].checked){
+  if (displayOptions[0].checked) {
     machine.appendChild(D.createDirectedGraph());
-  }
-  else{
+  } else {
     machine.appendChild(M.createDirectedGraph());
   }
 }
@@ -37,7 +36,26 @@ acceptedString.addEventListener("keypress", function (event) {
 let searchBtn = document.getElementById("searchBtn");
 searchBtn.addEventListener("click", function () {
   let searchText = document.getElementById("searchText");
-  let inMachine = D.isAccepted(searchText.value);
+  let found = false;
+  if (displayOptions[0].checked) {
+    found = D.search(searchText.value);
+  } else {
+    found = M.search(searchText.value);
+  }
+  let searchResult = document.getElementById("search-result");
+  if (found == false) {
+    searchResult.innerText = "String not found in Language";
+    searchResult.style.color = "red";
+    setTimeout(() => {
+      searchResult.innerText = ""; // Clear the message after 10 seconds
+    }, 10000);
+  } else {
+    searchResult.innerText = "String found in Language";
+    searchResult.style.color = "green";
+    setTimeout(() => {
+      searchResult.innerText = ""; // Clear the message after 10 seconds
+    }, 10000);
+  }
   searchText.value = "";
 });
 
