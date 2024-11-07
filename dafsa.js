@@ -245,11 +245,6 @@ class DAFSA {
     });
   }
 
-  get_states() {
-    //returns the object containing all the information about all states
-    return this.states;
-  }
-
   remove_accepted_string(s) {
     // Ensure the string is in the machine and can be removed
     if (!this.history.includes(s)) {
@@ -464,7 +459,7 @@ class DAFSA {
       .attr("stroke", "white")
       .attr("stroke-width", 3);
 
-    let spacing = 80; // Adjust spacing between nodes
+    let spacing = 75; // Adjust spacing between nodes
     let fxyList = [];
 
     //finds node based off node name
@@ -483,7 +478,7 @@ class DAFSA {
       node.fy = y; //sets y position of the node
       // changes the postion for the child
       let childX = x + spacing;
-      let childY = y + spacing;
+      let childY = y+spacing;
       if (index > 0) {
         // if the parent has multiple children in the hierarchy than adjust spacing
         node.fx = node.fx - spacing * index;
@@ -543,8 +538,6 @@ class DAFSA {
       machine.style.cursor = "grab";
     }
     //returns the svg
-    let sv = document.createElement("svg");
-    sv = svg.node();
     return svg.node();
   }
 

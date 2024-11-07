@@ -55,7 +55,7 @@ h1{
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  /* flex-wrap: wrap; */
+  flex-wrap: wrap;
 }
 .mainContent>div{
   border-radius: 12px;
@@ -113,11 +113,18 @@ h1{
   height: 20px;
   margin: 5px;
 }
+.machine-wrapper{
+  height: 400px;
+  overflow-y: auto;
+}
 #machine{
   width: 70dvw;
-  height: 70dvh;
+  height: 400px;
   cursor: grab;
-  overflow: scroll;
+}
+#history{
+  min-width: 20%;
+  height: 400px;
 }
 #history-list{
   display: flex;

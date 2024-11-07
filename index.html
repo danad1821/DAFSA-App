@@ -29,8 +29,6 @@
         <button id="searchBtn">Search</button>
       </div>
     </div>
-    <button id="resetBtn">Reset Machine</button>
-
     <div class="mainContent">
       <div class="machineContent">
         <div class="toggle">
@@ -51,8 +49,10 @@
         <div id="search-result">
 
         </div>
-        <div id="machine">
-          <!-- The Machine will be displayed here -->
+        <div class="machine-wrapper">
+          <div id="machine">
+            <!-- The Machine will be displayed here -->
+          </div>
         </div>
         <label for="format">Select format:</label>
         <select id="format">
@@ -65,6 +65,7 @@
       </div>
       <div id="history">
         <h2>Added Strings History</h2>
+        <button id="resetBtn">Reset Machine</button>
         <ul id="history-list"></ul>
       </div>
     </div>
