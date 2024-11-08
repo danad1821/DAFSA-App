@@ -169,7 +169,7 @@ class DAFSA {
           this.add_edge("q" + i, "q" + (i + 1), s[i]);
         }
       }
-      //adds final state and the the edge to get to it
+      //adds final state and the edge to get to it
       this.add_final_state("q" + slen);
       this.add_edge("q" + (slen - 1), "q" + slen, s[slen - 1]);
     } else {
@@ -182,30 +182,38 @@ class DAFSA {
 
         for (const v of this.states[currentState]) {
           if (v[1] === s[index]) {
-            currentState = v[0]; //changes the current state to the one reached by the machine
+            currentState = v[0]; // changes the current state to the one reached by the machine
             ind = index + 1; // add 1 to ind to later determine where to start adding states
-            changeOccurred = true; // changes the value of changeOccured since a change occured
+            changeOccurred = true; // changes the value of changeOccurred since a change occurred
             break;
           }
         }
-        //if no change occured that means it should start adding states after this one
+        // if no change occurred that means it should start adding states after this one
         if (!changeOccurred) {
           break;
         }
       }
       // the state already exists and might just need to be converted into a final state
       if (ind === slen) {
-        this.non_final_to_final_conversion(currentState); // converts from non final to final state
+        this.non_final_to_final_conversion(currentState); // converts from non-final to final state
+
+        // Ensure 's' is added to the history even if it's a substring of an existing string
+        if (!this.history.includes(s)) {
+          this.history.push(s);
+        }
+        this.updateHistoryDisplay(); // Update the history display
         return;
       }
+
       let n = Object.keys(this.states).length; // get the number of states in the machine
-      //
+
+      // Add remaining states for the string after finding existing path
       for (let index = 0; index < slen; index++) {
         if (index >= ind && index !== slen - 1) {
           this.add_non_final_state("q" + n);
           this.add_edge(currentState, "q" + n, s[index]);
-          currentState = "q" + n; //changes current state to the state just creates
-          n++; // adds 1 to n
+          currentState = "q" + n; // changes current state to the state just created
+          n++; // increments n
         }
       }
       // adds the final state used to accept this new string
@@ -213,9 +221,11 @@ class DAFSA {
       this.add_edge(currentState, "q" + n, s[slen - 1]);
     }
 
-    // Add the string to the history and display it
-    this.history.push(s);
-    this.updateHistoryDisplay();
+    // Ensure the string is added to the history after adding it to the machine
+    if (!this.history.includes(s)) {
+      this.history.push(s);
+    }
+    this.updateHistoryDisplay(); // Refresh the history display
   }
 
   updateHistoryDisplay() {
@@ -252,55 +262,70 @@ class DAFSA {
     }
 
     let currentState = this.initial_state;
-    let previousState = null;
     let path = []; // Track the path of states and characters
 
     // Traverse and record each state and transition used by the string
     for (const character of s) {
-      let foundTransition = false; // Track if a valid transition is found
+      let foundTransition = false;
       for (const edge of this.states[currentState]) {
         if (edge[1] === character) {
-          previousState = currentState;
+          path.push({
+            previousState: currentState,
+            currentState: edge[0],
+            character,
+          });
           currentState = edge[0];
-          path.push({ previousState, currentState, character });
-          foundTransition = true; // A transition was found
+          foundTransition = true;
           break;
         }
       }
       if (!foundTransition) {
-        return false; // If no transition found, the string cannot be removed
+        return false; // Transition for the character does not exist; cannot remove
       }
     }
 
-    // Convert final state to non-final state if necessary
-    if (this.final_states.includes(currentState)) {
-      this.final_to_non_final_conversion(currentState);
-    }
-
-    // Backtrack to remove transitions and orphaned states
-    for (let i = path.length - 1; i >= 0; i--) {
-      const { previousState, currentState, character } = path[i];
+    // Determine if this is Case 1 or Case 2
+    if (this.states[currentState].length > 0) {
+      // **Case 1**: The final state has outgoing transitions, so we should only convert it to a non-final state
+      if (this.final_states.includes(currentState)) {
+        this.final_to_non_final_conversion(currentState);
+      }
+    } else {
+      // **Case 2**: The final state has no outgoing transitions, so we remove only this final state
+      const { previousState } = path[path.length - 1];
 
       // Remove the transition from `previousState` to `currentState`
       this.states[previousState] = this.states[previousState].filter(
-        (edge) => edge[0] !== currentState || edge[1] !== character
+        (edge) => edge[0] !== currentState
       );
 
-      // If `currentState` has no incoming or outgoing transitions, delete it
-      if (this.states[currentState] && this.states[currentState].length === 0) {
-        delete this.states[currentState];
-        this.final_states = this.final_states.filter(
-          (state) => state !== currentState
-        );
-        this.non_final_states = this.non_final_states.filter(
-          (state) => state !== currentState
-        );
-      }
+      // Delete the final state itself from the internal structure
+      delete this.states[currentState];
+      this.final_states = this.final_states.filter(
+        (state) => state !== currentState
+      );
+      this.non_final_states = this.non_final_states.filter(
+        (state) => state !== currentState
+      );
     }
 
     // Update history to remove the string and refresh the display
     this.history = this.history.filter((str) => str !== s);
     this.updateHistoryDisplay();
+
+    // Redraw the machine only if there are remaining states
+    const machineDiv = document.getElementById("machine");
+    machineDiv.innerHTML = ""; // Clear the existing graph
+
+    if (Object.keys(this.states).length > 0) {
+      if (document.getElementById("expanded").checked) {
+        machineDiv.appendChild(this.createDirectedGraph()); // Redraw the expanded machine
+      } else {
+        machineDiv.appendChild(this.minimize_dafsa().createDirectedGraph()); // Redraw the minimized machine
+      }
+    } else {
+      machineDiv.innerHTML = "<p>The machine is now empty.</p>"; // Display message if all states are removed
+    }
 
     return true; // String successfully removed
   }
@@ -320,7 +345,7 @@ class DAFSA {
       //also used to create the hierarchy
       nodes.push({ id: v.toString() });
       if (links.length == 0) {
-        nodes.push({ id: "start" })
+        nodes.push({ id: "start" });
         links.push({ source: "start", target: v.toString() });
         nodeHierarchy["start"].push(v.toString());
       }
@@ -478,7 +503,7 @@ class DAFSA {
       node.fy = y; //sets y position of the node
       // changes the postion for the child
       let childX = x + spacing;
-      let childY = y+spacing;
+      let childY = y + spacing;
       if (index > 0) {
         // if the parent has multiple children in the hierarchy than adjust spacing
         node.fx = node.fx - spacing * index;
