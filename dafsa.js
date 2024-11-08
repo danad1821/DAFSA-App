@@ -306,6 +306,7 @@ class DAFSA {
   }
 
   createDirectedGraph() {
+    let states=Object.keys(this.states)
     machine.innerHTML = ""; //clears the machine
     let nodeHierarchy = {
       start: [],
@@ -315,7 +316,7 @@ class DAFSA {
     let symbols = ["~"]; // symbols used for transitions
     let linkArc = (d) =>
       `M${d.source.x},${d.source.y}A0,0 0 0,1 ${d.target.x},${d.target.y}`; //function to create the arrow head shape
-    for (const v of Object.keys(this.states)) {
+    for (const v of states) {
       //goes through the directed graph to collect all nodes, links and symbols
       //also used to create the hierarchy
       nodes.push({ id: v.toString() });
@@ -334,6 +335,9 @@ class DAFSA {
     const color = d3.scaleOrdinal(symbols, d3.schemeCategory10); //creates different colored arrows depending on symbol
     const width = machine.offsetWidth; //width of figure is equal to the machine div's width
     const height = machine.offsetHeight; //height of figure is equal to the machine div's height
+    if(states.length>4){
+      height=machine.offsetHeight+(100*(states.length-4));
+    }
 
     const simulation = d3
       .forceSimulation(nodes)
