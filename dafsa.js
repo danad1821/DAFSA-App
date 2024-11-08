@@ -339,7 +339,7 @@ class DAFSA {
     }
     const color = d3.scaleOrdinal(symbols, d3.schemeCategory10); //creates different colored arrows depending on symbol
     const width = machine.offsetWidth; //width of figure is equal to the machine div's width
-    const height = machine.offsetHeight; //height of figure is equal to the machine div's height
+    let height = machine.offsetHeight; //height of figure is equal to the machine div's height
     if(states.length>4){
       height=machine.offsetHeight+(100*(states.length-4));
     }
@@ -444,7 +444,8 @@ class DAFSA {
       .attr("stroke-width", 1.5)
       .attr("r", 25)
       .attr("class", (d) => d.id)
-      .attr("fill", (d) => "white");
+      .attr("fill", (d) => "#ADBADA#8697C3")
+      .attr("class", (d) => (d.id === "start" ? "start" : (this.final_states.includes(d.id) ? "final" : "non-final")));
     //if the state is a final state it adds another circle
     node
       .selectAll("circle.inner") // Select inner circles based on class
@@ -455,7 +456,7 @@ class DAFSA {
       .attr("stroke", "black")
       .attr("stroke-width", 1.5)
       .attr("class", (d) => d.id)
-      .attr("fill", (d) => "white"); // Fill inner circle
+      .attr("fill", (d) => "#8697C3"); // Fill inner circle
 
     node
       .append("text")
@@ -506,7 +507,7 @@ class DAFSA {
     }
 
     // Initial node positioning
-    positionNodes(findNode("start"), -100, -200, 0, 0); // Start with root node
+    positionNodes(findNode("start"), -100, -height+(states.length/2)*150, 0, 0); // Start with root node
 
     // Start the simulation
     simulation.alpha(1).restart();

@@ -153,6 +153,9 @@ h1{
   height: 400px;
   cursor: grab;
 }
+.final, .inner{
+  fill: #8697C3;
+}
 
 #history{
   width: 400px;
