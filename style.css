@@ -1,16 +1,19 @@
 *{
   margin: 0;
   padding: 0;
+  font-family: 'Roboto';
 }
 body{
   background-color: #F0EAF4;
 }
 h1{
-  padding: 20px;
+  padding: 10px;
   margin: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   text-align: center;
   border-radius: 12px;
-  background: linear-gradient(to right, #ADBADA, #7191E6);
+  background: linear-gradient(to right, #ADBADA 35%, #7191E6 65%);
   color: white;
 }
 .mainFunctions{
@@ -19,6 +22,7 @@ h1{
   justify-content: center;
   gap: 50px;
   flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 .mainFuntionInput{
   border: 1px solid #3D52A1;
@@ -26,29 +30,34 @@ h1{
   font-size: 20px;
   min-width: 200px;
   background-color: #ADBADA;
+  height: 50px;
+  display: flex;
+  align-items: center;
 }
 .mainFuntionInput input{
   border: none;
   padding: 20px;
   border-radius: 50px;
-  min-width: 210px;
+  min-width: 200px;
   outline: none;
   background: none;
   color: white;
 }
 .mainFuntionInput button{
-  padding: 20px;
+  padding: 10px;
   border-radius: 50px;
   border: none;
-  margin: 3px;
+  margin: 2px;
   min-width: 80px;
   background-color: #3D52A1;
   color: white;
   font-size: 17px;
+  height: 45px;
   min-width: 100px;
 }
 .mainFuntionInput input::placeholder{
   color: white;
+  font-size: 12px;
 }
 .mainContent{
   display: flex;
@@ -56,23 +65,38 @@ h1{
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+  gap: 15px;
 }
 .mainContent>div{
   border-radius: 12px;
   border: 1px solid black;
   padding: 10px;
-  margin: 10px;
+  /* margin: 10px;
+  margin-right: 0px;
+  margin-bottom: 0px; */
   background-color: white;
 }
-.mainContent>div:first-child{
+/* .mainContent>div:first-child{
   min-width: 40vw;
-}
+} */
 .machineContent{
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  /* gap: 3px; */
+  width: 928px;
 }
+
+.machineContent, #history{
+  background-color: white;
+  border: 1px solid black;
+  height: 57vh;
+}
+
+#history{
+  margin-left: 0px;
+}
+
 .toggle{
   display: flex;
   justify-content: space-around;
@@ -81,6 +105,7 @@ h1{
   width: 200px;
   position: relative;
   background-color: #3D52A1;
+  margin-top: 10px;
 }
 .checkboxOption{
   z-index: 10;
@@ -108,6 +133,12 @@ h1{
   justify-content: center;
   align-items: center;
 }
+
+.emptyCheckboxDiv label{
+  font-size: 12px;
+}
+
+
 #emptyCheckbox{
   width: 20px;
   height: 20px;
@@ -122,14 +153,27 @@ h1{
   height: 400px;
   cursor: grab;
 }
+
 #history{
-  min-width: 20%;
-  height: 400px;
+  width: 400px;
 }
+
+#history h3{
+  text-align: center;
+  margin-top: 15px;
+}
+
+.removeBtn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
 #history-list{
   display: flex;
   flex-wrap: wrap;
-  flex-direction: column;
+  flex-direction: row;
 }
 .stringAdded{
   list-style: none;
@@ -141,5 +185,95 @@ h1{
   padding: 5px;
   margin: 5px;
   min-width: 50px;
-  border: 1px solid #3D52A1;
+  border: 2px solid #3D52A1;
+  width: 100px;
+}
+
+.stringAdded i{
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+#downloadFormat{
+  display: flex;
+  flex-direction: row;
+}
+
+#downloadFormat label{
+  margin-right: 10px;
+}
+
+#format, #finalStateColorDrop, #nonFinalStateColorDrop{
+  width: 70px;
+  background-color: #7191E6;
+  border-radius: 25px;
+  color: white;
+  text-align: center;
+  border: none;
+}
+
+#downloadBtn, #resetBtn
+{
+  width: 100px;
+  background-color: #7191E6;
+  color: white;
+  border: none;
+  padding: 5px;
+  border-radius: 25px;
+  margin-bottom: 3px;
+}
+
+
+#download-reset{
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  margin-top: 5px;
+}
+
+#general-info{
+  background-color: white;
+  border-radius: 15px;
+  height: 124px;
+  border: 1px solid black;
+  margin-top: 15px;
+  width: 1385px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: row;
+}
+
+
+#MachineInfo{
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  line-height: 30px;
+  margin-left: 20px;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
+}
+
+#colors{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  gap: 80px;  
+}
+
+#nonfinalStateColor, #finalStatesColor{
+  display: flex;
+  flex-direction: column;
+  margin: 0 10px;
+  gap: 10px;
+  font-weight: bold;
+}
+
+
+#finalStateColorDrop, #nonFinalStateColorDrop{
+  width: auto;
 }
