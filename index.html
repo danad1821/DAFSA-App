@@ -1,79 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DAFSA</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
 
-  <body>
-    <h1>DAFSA Machine Tester</h1>
-    <div class="mainFunctions">
-      <div class="mainFuntionInput">
-        <input
-          type="text"
-          placeholder="Type a string to add to the machine"
-          name="acceptedString"
-          id="acceptedString"
-        />
-        <button id="addBtn">Add</button>
-      </div>
-      <div class="mainFuntionInput">
-        <input
-          type="text"
-          placeholder="Type string to search for"
-          name="search"
-          id="searchText"
-        />
-        <button id="searchBtn">Search</button>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DAFSA</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+</head>
+
+<body>
+  <h1>DAFSA Machine Tester</h1>
+  <div class="mainFunctions">
+    <div class="mainFuntionInput">
+      <input type="text" placeholder="Type a string to add to the machine" name="acceptedString" id="acceptedString" />
+      <button id="addBtn">Add</button>
     </div>
-    <div class="mainContent">
-      <div class="machineContent">
-        <div class="toggle">
-          <div class="toggle-color"></div>
-          <div class="checkboxOption">
-            <input type="checkbox" name="expanded" id="expanded" />
-            <label for="expanded">Expanded</label>
-          </div>
-          <div class="checkboxOption">
-            <input type="checkbox" name="minimized" id="minimized" />
-            <label for="minimized">Minimized</label>
-          </div>
+    <div class="mainFuntionInput">
+      <input type="text" placeholder="Type string to search for" name="search" id="searchText" />
+      <button id="searchBtn">Search</button>
+    </div>
+  </div>
+  <div class="mainContent">
+    <div class="machineContent">
+      <div class="toggle">
+        <div class="toggle-color"></div>
+        <div class="checkboxOption">
+          <input type="checkbox" name="expanded" id="expanded" />
+          <label for="expanded">Expanded</label>
         </div>
-        <div class="emptyCheckboxDiv">
-          <input type="checkbox" name="emptyCheckbox" id="emptyCheckbox" />
-          <label for="emptyCheckbox">Accepts Empty String</label>
+        <div class="checkboxOption">
+          <input type="checkbox" name="minimized" id="minimized" />
+          <label for="minimized">Minimized</label>
         </div>
-        <div id="search-result">
+      </div>
+      <div class="emptyCheckboxDiv">
+        <input type="checkbox" name="emptyCheckbox" id="emptyCheckbox" />
+        <label for="emptyCheckbox">Accepts Empty String</label>
+      </div>
+      <div id="search-result">
 
+      </div>
+      <div class="machine-wrapper">
+        <div id="machine">
+          <!-- The Machine will be displayed here -->
         </div>
-        <div class="machine-wrapper">
-          <div id="machine">
-            <!-- The Machine will be displayed here -->
-          </div>
-        </div>
-        <label for="format">Select format:</label>
+      </div>
+      <div id="downloadFormat">
+        <label for="format">Download Graph as:</label>
         <select id="format">
           <option value="png">PNG</option>
           <option value="jpeg">JPEG</option>
         </select>
-        <button onclick="downloadGraphAsImage()">
-          Download Graph as Image
-        </button>
       </div>
-      <div id="history">
-        <h2>Added Strings History</h2>
+      <div id="download-reset">
+        <button onclick="downloadGraphAsImage()" id="downloadBtn">
+          Download
+        </button>
         <button id="resetBtn">Reset Machine</button>
-        <ul id="history-list"></ul>
       </div>
     </div>
+    <div id="history">
+      <h3>History of Added Strings</h3>
+      <ul id="history-list"></ul>
+    </div>
+  </div>
 
-    <div id="stateInformation"></div>
-    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-    <script src="dafsa.js"></script>
-    <script src="main.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  </body>
+  <div id="general-info">
+    <div id="MachineInfo">
+      <div>
+        <p>Current count of accepted strings:</p>
+        <p></p>
+      </div>
+      <div>Suggested languages to add: aa, 123, cosc421</div>
+    </div>
+    <div id="colors">
+      <div id="finalStatesColor">
+        <label>Color of final state(s):</label>
+        <select id="finalStateColorDrop" name="finalStateColor">
+          <option value="blue">Lavender Gray</option>
+          <option value="purple">Purple</option>
+          <option value="orange">Orange</option>
+          <option value="orange">Light Steel Blue</option>
+        </select>
+      </div>
+
+      <div id="nonfinalStateColor">
+        <label>Color of non-final state(s):</label>
+        <select id="nonFinalStateColorDrop" name="nonFinalStateColor">
+          <option value="orange">Light Steel Blue</option>
+          <option value="purple">Purple</option>
+          <option value="orange">Orange</option>
+          <option value="blue">Lavender Gray</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div id="stateInformation"></div>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="dafsa.js"></script>
+  <script src="main.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</body>
+
 </html>

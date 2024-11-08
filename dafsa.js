@@ -227,9 +227,14 @@ class DAFSA {
       listItem.className = "stringAdded";
       // Create Remove button
       const removeButton = document.createElement("button");
-      removeButton.textContent = "Remove";
+      // removeButton.textContent = "Remove";
       removeButton.className = "removeBtn";
       // removeButton.onclick = () => this.remove_accepted_string(str);
+
+      // Add Font Awesome trash icon
+      const trashIcon = document.createElement("i");
+      trashIcon.className = "fas fa-trash";
+      removeButton.appendChild(trashIcon);
 
       removeButton.onclick = () => {
         if (this.remove_accepted_string(str)) {
@@ -482,7 +487,7 @@ class DAFSA {
       node.fy = y; //sets y position of the node
       // changes the postion for the child
       let childX = x + spacing;
-      let childY = y+spacing;
+      let childY = y + spacing;
       if (index > 0) {
         // if the parent has multiple children in the hierarchy than adjust spacing
         node.fx = node.fx - spacing * index;
