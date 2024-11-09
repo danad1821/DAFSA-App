@@ -311,7 +311,7 @@ class DAFSA {
   }
 
   createDirectedGraph() {
-    let states=Object.keys(this.states)
+    let states = Object.keys(this.states);
     machine.innerHTML = ""; //clears the machine
     let nodeHierarchy = {
       start: [],
@@ -326,7 +326,7 @@ class DAFSA {
       //also used to create the hierarchy
       nodes.push({ id: v.toString() });
       if (links.length == 0) {
-        nodes.push({ id: "start" })
+        nodes.push({ id: "start" });
         links.push({ source: "start", target: v.toString() });
         nodeHierarchy["start"].push(v.toString());
       }
@@ -340,8 +340,8 @@ class DAFSA {
     const color = d3.scaleOrdinal(symbols, d3.schemeCategory10); //creates different colored arrows depending on symbol
     const width = machine.offsetWidth; //width of figure is equal to the machine div's width
     let height = machine.offsetHeight; //height of figure is equal to the machine div's height
-    if(states.length>4){
-      height=machine.offsetHeight+(100*(states.length-4));
+    if (states.length > 4) {
+      height = machine.offsetHeight + 80 * (states.length - 4);
     }
 
     const simulation = d3
@@ -370,7 +370,7 @@ class DAFSA {
       .join("marker")
       .attr("id", (d) => `arrow-${d}`) //to give it the arrow style and change the color depending on the symbol shown
       .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 38)
+      .attr("refX", 30)
       .attr("refY", 0)
       //styling for the arrow
       .attr("markerWidth", 6)
@@ -442,17 +442,23 @@ class DAFSA {
       .attr("stroke", "black")
       .attr("opacity", (d) => (d.id === "start" ? 0 : 1))
       .attr("stroke-width", 1.5)
-      .attr("r", 25)
+      .attr("r", 20)
       .attr("class", (d) => d.id)
-      .attr("fill", (d) => "#ADBADA#8697C3")
-      .attr("class", (d) => (d.id === "start" ? "start" : (this.final_states.includes(d.id) ? "final" : "non-final")));
+      .attr("fill", (d) => "#ADBADA")
+      .attr("class", (d) =>
+        d.id === "start"
+          ? "start"
+          : this.final_states.includes(d.id)
+          ? "final"
+          : "non-final"
+      );
     //if the state is a final state it adds another circle
     node
       .selectAll("circle.inner") // Select inner circles based on class
       .data((d) => (this.final_states.includes(d.id) ? [d] : [])) // Join data if the state is a final state
       .join("circle")
-      .attr("class", "inner") // Add class for conditional selection
-      .attr("r", 20) // Inner circle radius
+      .attr("class", "inner") // Adds class for conditional selection
+      .attr("r", 15) // Inner circle radius
       .attr("stroke", "black")
       .attr("stroke-width", 1.5)
       .attr("class", (d) => d.id)
@@ -460,16 +466,17 @@ class DAFSA {
 
     node
       .append("text")
-      .attr("x", -6) // Center text horizontally
-      .attr("y", 5) // Adjust y-coordinate for vertical positioning
+      .attr("x", -6) // Centering text horizontally
+      .attr("y", 5) // Adjusting y-coordinate for vertical positioning
       .text((d) => d.id)
-      .clone(true)
+      .attr('class', 'node-text')
+      .clone(false)
       .lower()
       .attr("fill", "none")
       .attr("stroke", "white")
-      .attr("stroke-width", 3);
+      .attr("stroke-width", 1);
 
-    let spacing = 75; // Adjust spacing between nodes
+    let spacing = 65; // Adjust spacing between nodes
     let fxyList = [];
 
     //finds node based off node name
@@ -507,7 +514,13 @@ class DAFSA {
     }
 
     // Initial node positioning
-    positionNodes(findNode("start"), -100, -height+(states.length/2)*150, 0, 0); // Start with root node
+    positionNodes(
+      findNode("start"),
+      -100,
+      -height + (states.length / 2) * 150,
+      0,
+      0
+    ); // Start with root node
 
     // Start the simulation
     simulation.alpha(1).restart();

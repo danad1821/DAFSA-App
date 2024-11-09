@@ -156,6 +156,9 @@ h1{
 .final, .inner{
   fill: #8697C3;
 }
+.node-text, .linkLabel{
+  font-size: 12px;
+}
 
 #history{
   width: 400px;
