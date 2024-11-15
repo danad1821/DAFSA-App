@@ -1,22 +1,22 @@
-*{
+* {
   margin: 0;
   padding: 0;
-  font-family: 'Roboto';
+  font-family: "Roboto";
 }
-body{
-  background-color: #F0EAF4;
+body {
+  background-color: #f0eaf4;
 }
-h1{
+h1 {
   padding: 10px;
   margin: 20px;
   margin-top: 10px;
   margin-bottom: 10px;
   text-align: center;
   border-radius: 12px;
-  background: linear-gradient(to right, #ADBADA 35%, #7191E6 65%);
+  background: linear-gradient(to right, #adbada 35%, #7191e6 65%);
   color: white;
 }
-.mainFunctions{
+.mainFunctions {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -24,17 +24,17 @@ h1{
   flex-wrap: wrap;
   margin-bottom: 10px;
 }
-.mainFuntionInput{
-  border: 1px solid #3D52A1;
+.mainFuntionInput {
+  border: 1px solid #3d52a1;
   border-radius: 50px;
   font-size: 20px;
   min-width: 200px;
-  background-color: #ADBADA;
+  background-color: #adbada;
   height: 50px;
   display: flex;
   align-items: center;
 }
-.mainFuntionInput input{
+.mainFuntionInput input {
   border: none;
   padding: 20px;
   border-radius: 50px;
@@ -43,23 +43,23 @@ h1{
   background: none;
   color: white;
 }
-.mainFuntionInput button{
+.mainFuntionInput button {
   padding: 10px;
   border-radius: 50px;
   border: none;
   margin: 2px;
   min-width: 80px;
-  background-color: #3D52A1;
+  background-color: #3d52a1;
   color: white;
   font-size: 17px;
   height: 45px;
   min-width: 100px;
 }
-.mainFuntionInput input::placeholder{
+.mainFuntionInput input::placeholder {
   color: white;
   font-size: 12px;
 }
-.mainContent{
+.mainContent {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -67,7 +67,7 @@ h1{
   flex-wrap: wrap;
   gap: 15px;
 }
-.mainContent>div{
+.mainContent > div {
   border-radius: 12px;
   border: 1px solid black;
   padding: 10px;
@@ -79,7 +79,7 @@ h1{
 /* .mainContent>div:first-child{
   min-width: 40vw;
 } */
-.machineContent{
+.machineContent {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -87,86 +87,88 @@ h1{
   width: 928px;
 }
 
-.machineContent, #history{
+.machineContent,
+#history {
   background-color: white;
   border: 1px solid black;
   /* height: 57vh; */
   height: 80vh;
 }
 
-#history{
+#history {
   margin-left: 0px;
 }
 
-.toggle{
+.toggle {
   display: flex;
   justify-content: space-around;
   padding: 10px;
   border-radius: 50px;
   width: 200px;
   position: relative;
-  background-color: #3D52A1;
+  background-color: #3d52a1;
   margin-top: 10px;
 }
-.checkboxOption{
+.checkboxOption {
   z-index: 10;
   cursor: pointer;
 }
-.toggle input[type=checkbox]{
+.toggle input[type="checkbox"] {
   display: none;
 }
-.toggle label{
+.toggle label {
   text-align: center;
   color: white;
 }
-.toggle-color{
+.toggle-color {
   position: absolute;
   top: 2px;
   left: 4px;
-  background-color: #ADBADA;
+  background-color: #adbada;
   border-radius: 50px;
   width: 48%;
   height: 90%;
   z-index: 5;
 }
-.emptyCheckboxDiv{
+.emptyCheckboxDiv {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.emptyCheckboxDiv label{
+.emptyCheckboxDiv label {
   font-size: 12px;
 }
 
-
-#emptyCheckbox{
+#emptyCheckbox {
   width: 20px;
   height: 20px;
   margin: 5px;
 }
-.machine-wrapper{
+.machine-wrapper {
   height: 400px;
   overflow-y: auto;
 }
-#machine{
+#machine {
   width: 70dvw;
   height: 400px;
   cursor: grab;
 }
-.final, .inner{
-  fill: #8697C3;
+.final,
+.inner {
+  fill: #8697c3;
 }
 
-.node-text, .linkLabel{
+.node-text,
+.linkLabel {
   font-size: 12px;
 }
 
-#history{
+#history {
   width: 400px;
 }
 
-#history h3{
+#history h3 {
   text-align: center;
   margin-top: 15px;
 }
@@ -178,53 +180,55 @@ h1{
   cursor: pointer;
 }
 
-#history-list{
+#history-list {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
 }
-.stringAdded{
+.stringAdded {
   list-style: none;
   display: flex;
   border-radius: 12px;
-  background-color: #EEE8F6;
+  background-color: #eee8f6;
   justify-content: space-between;
   align-items: center;
   padding: 5px;
   margin: 5px;
   min-width: 50px;
-  border: 2px solid #3D52A1;
+  border: 2px solid #3d52a1;
   width: 100px;
 }
 
-.stringAdded i{
+.stringAdded i {
   font-size: 16px;
   margin-right: 5px;
 }
 
-#downloadFormat{
+#downloadFormat {
   display: flex;
   flex-direction: row;
   margin-top: 30px;
 }
 
-#downloadFormat label{
+#downloadFormat label {
   margin-right: 10px;
 }
 
-#format, #finalStateColorDrop, #nonFinalStateColorDrop{
+#format,
+#finalStateColorDrop,
+#nonFinalStateColorDrop {
   width: 70px;
-  background-color: #7191E6;
+  background-color: #7191e6;
   border-radius: 25px;
   color: white;
   text-align: center;
   border: none;
 }
 
-#downloadBtn, #resetBtn
-{
+#downloadBtn,
+#resetBtn {
   width: 100px;
-  background-color: #7191E6;
+  background-color: #7191e6;
   color: white;
   border: none;
   padding: 5px;
@@ -232,15 +236,14 @@ h1{
   margin-bottom: 3px;
 }
 
-
-#download-reset{
+#download-reset {
   display: flex;
   flex-direction: row;
   gap: 15px;
   margin-top: 5px;
 }
 
-#general-info{
+#general-info {
   background-color: white;
   border-radius: 15px;
   height: 124px;
@@ -257,8 +260,7 @@ h1{
   padding: 10px;
 }
 
-
-#MachineInfo{
+#MachineInfo {
   display: flex;
   flex-direction: column;
   font-weight: bold;
@@ -269,26 +271,29 @@ h1{
   height: 100%;
 }
 
-#count, #suggestedLanguages{
+#count,
+#suggestedLanguages {
   display: flex;
   flex-direction: row;
 }
 
-#countOfStrings, #suggestedLanguages p:nth-child(2){
+#countOfStrings,
+#suggestedLanguages p:nth-child(2) {
   font-weight: normal;
   margin-left: 10px;
 }
 
-#colors{
+#colors {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   flex-grow: 1;
-  gap: 80px;  
+  gap: 80px;
 }
 
-#nonfinalStateColor, #finalStatesColor{
+#nonfinalStateColor,
+#finalStatesColor {
   display: flex;
   flex-direction: column;
   margin: 0 10px;
@@ -296,41 +301,61 @@ h1{
   font-weight: bold;
 }
 
-
-#finalStateColorDrop, #nonFinalStateColorDrop{
+#finalStateColorDrop,
+#nonFinalStateColorDrop {
   width: auto;
 }
 
-@media (max-width: 1200px){
-  #MainContent{
-    flex-direction: column; 
-  }
-
-  #history, #general-info{
-    width: 928px;
-  }
-
-}
-
-@media (max-width: 860px){
-  #general-info{
+@media (max-width: 1200px) {
+  #MainContent {
     flex-direction: column;
   }
 
-  #MachineInfo{
-    align-items: center;
-    margin-bottom: 20px;
+  #history,
+  #general-info {
+    width: 928px;
   }
 }
 
-@media (max-width: 460px){
+@media (max-width: 860px) {
+  #general-info {
+    flex-direction: column;
+  }
 
-  #general-info{
+  #MachineInfo {
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .mainFunctions {
+    gap: 10px;
+  }
+
+  .mainFuntionInput {
+    width: 300px !important;
+  }
+
+  .mainFuntionInput input {
+    min-width: 187px !important;
+  }
+
+  .mainFuntionInput button {
+    min-width: 70px !important;
+  }
+
+  .mainContent {
+    margin: 0 20px;
+  }
+}
+
+@media (max-width: 460px) {
+  #general-info {
     height: 150px;
   }
 
-  #nonfinalStateColor label, #finalStatesColor label, #MachineInfo p{
+  #nonfinalStateColor label,
+  #finalStatesColor label,
+  #MachineInfo p {
     font-size: 12px;
   }
-
 }
