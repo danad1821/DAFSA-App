@@ -313,18 +313,25 @@ class DAFSA {
     this.history = this.history.filter((str) => str !== s);
     this.updateHistoryDisplay();
 
-    // Redraw the machine only if there are remaining states
     const machineDiv = document.getElementById("machine");
-    machineDiv.innerHTML = ""; // Clear the existing graph
 
-    if (Object.keys(this.states).length > 0) {
-      if (document.getElementById("expanded").checked) {
-        machineDiv.appendChild(this.createDirectedGraph()); // Redraw the expanded machine
-      } else {
-        machineDiv.appendChild(this.minimize_dafsa().createDirectedGraph()); // Redraw the minimized machine
-      }
+    // Reset the machine if history is empty
+    if (this.history.length === 0) {
+      this.states = {}; // Clear all states
+      this.initial_state = null;
+      this.final_states = [];
+      this.non_final_states = [];
+      machineDiv.innerHTML = ""; // Clear the graph display
     } else {
-      machineDiv.innerHTML = "<p>The machine is now empty.</p>"; // Display message if all states are removed
+      // Otherwise, redraw the machine as usual
+      machineDiv.innerHTML = ""; // Clear the existing graph
+      if (Object.keys(this.states).length > 0) {
+        if (document.getElementById("expanded").checked) {
+          machineDiv.appendChild(this.createDirectedGraph()); // Redraw the expanded machine
+        } else {
+          machineDiv.appendChild(this.minimize_dafsa().createDirectedGraph()); // Redraw the minimized machine
+        }
+      }
     }
 
     return true; // String successfully removed
