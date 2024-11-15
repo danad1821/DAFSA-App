@@ -1,4 +1,6 @@
 let machine = document.getElementById("machine");
+let resetBtn = document.getElementById("resetBtn");
+
 function validate(x, a, b) {
   if (x < a) x = a;
   if (x > b) x = b;
@@ -156,6 +158,11 @@ class DAFSA {
   }
 
   add_accepted_string(s) {
+    if (!s || s.trim() === "") {
+      console.error("Cannot add an empty or invalid string.");
+      return;
+    }
+
     const slen = s.length;
     if (this.initial_state === null) {
       // if it is the first string to be accepted by the machine
@@ -169,7 +176,7 @@ class DAFSA {
           this.add_edge("q" + i, "q" + (i + 1), s[i]);
         }
       }
-      //adds final state and the edge to get to it
+      //adds final state and the the edge to get to it
       this.add_final_state("q" + slen);
       this.add_edge("q" + (slen - 1), "q" + slen, s[slen - 1]);
     } else {
@@ -182,17 +189,18 @@ class DAFSA {
 
         for (const v of this.states[currentState]) {
           if (v[1] === s[index]) {
-            currentState = v[0]; // changes the current state to the one reached by the machine
+            currentState = v[0]; //changes the current state to the one reached by the machine
             ind = index + 1; // add 1 to ind to later determine where to start adding states
-            changeOccurred = true; // changes the value of changeOccurred since a change occurred
+            changeOccurred = true; // changes the value of changeOccured since a change occured
             break;
           }
         }
-        // if no change occurred that means it should start adding states after this one
+        //if no change occured that means it should start adding states after this one
         if (!changeOccurred) {
           break;
         }
       }
+      // the state already exists and might just need to be converted into a final state
       // the state already exists and might just need to be converted into a final state
       if (ind === slen) {
         this.non_final_to_final_conversion(currentState); // converts from non-final to final state
@@ -206,14 +214,13 @@ class DAFSA {
       }
 
       let n = Object.keys(this.states).length; // get the number of states in the machine
-
-      // Add remaining states for the string after finding existing path
+      //
       for (let index = 0; index < slen; index++) {
         if (index >= ind && index !== slen - 1) {
           this.add_non_final_state("q" + n);
           this.add_edge(currentState, "q" + n, s[index]);
-          currentState = "q" + n; // changes current state to the state just created
-          n++; // increments n
+          currentState = "q" + n; //changes current state to the state just creates
+          n++; // adds 1 to n
         }
       }
       // adds the final state used to accept this new string
@@ -221,44 +228,88 @@ class DAFSA {
       this.add_edge(currentState, "q" + n, s[slen - 1]);
     }
 
-    // Ensure the string is added to the history after adding it to the machine
-    if (!this.history.includes(s)) {
-      this.history.push(s);
+    // Add the string to the history and display it
+    this.history.push(s);
+    this.updateHistoryDisplay();
+    if (this.history.includes(s)) {
+      console.log(`String "${s}" is added to history.`);
+    } else {
+      console.log(`String "${s}" already exists in history. Re-adding.`);
+      this.history.push(s); // Ensure the string is added to history
     }
-    this.updateHistoryDisplay(); // Refresh the history display
   }
 
   updateHistoryDisplay() {
     const historyList = document.getElementById("history-list");
+    const acceptedStringCountElement =
+      document.getElementById("countOfStrings"); // Correct selector
+
+    if (!historyList || !acceptedStringCountElement) {
+      console.error("DOM elements for history display are missing.");
+      return;
+    }
+
     historyList.innerHTML = ""; // Clear current history
     this.history.forEach((str) => {
       const listItem = document.createElement("li");
       listItem.textContent = str;
       listItem.className = "stringAdded";
+
       // Create Remove button
       const removeButton = document.createElement("button");
-      removeButton.textContent = "Remove";
+      // removeButton.textContent = "Remove";
       removeButton.className = "removeBtn";
       // removeButton.onclick = () => this.remove_accepted_string(str);
+
+      // Add Font Awesome trash icon
+      const trashIcon = document.createElement("i");
+      trashIcon.className = "fas fa-trash";
+      removeButton.appendChild(trashIcon);
 
       removeButton.onclick = () => {
         if (this.remove_accepted_string(str)) {
           this.updateHistoryDisplay(); // Refresh the display after removal
         } else {
-          alert("Could not remove the string from the machine.");
+          alert(`Could not remove the string "${str}" from the machine.`);
         }
       };
-
       // Add string and button to list item
       listItem.appendChild(removeButton);
       historyList.appendChild(listItem);
+
+      // Update the count of accepted strings
+      acceptedStringCountElement.textContent = this.history.length;
     });
+  }
+
+  resetMachine() {
+    const machine = document.getElementById("machine");
+    machine.innerHTML = ""; // Clear the displayed graph
+
+    const historyList = document.getElementById("history-list");
+    historyList.innerHTML = ""; // Clear the history list
+
+    // Optionally clear the count as well
+    const acceptedStringCountElement =
+      document.getElementById("countOfStrings");
+    acceptedStringCountElement.textContent = "0"; // Reset the count of accepted strings
+
+    updateHistoryDisplay(); // Call the function to update the history display
+
+    // If you want to also clear the history array in your class, you can reset it as well
+    this.history = []; // Clear the history array
   }
 
   remove_accepted_string(s) {
     // Ensure the string is in the machine and can be removed
     if (!this.history.includes(s)) {
-      return false; // String is not in history, cannot be removed
+      console.error(`String "${s}" does not exist in history.`); // String is not in history, cannot be removed
+      return false;
+    }
+    // Reset the machine if history is empty
+    if (this.history.length === 0) {
+      this.resetMachine();
+      return true;
     }
 
     let currentState = this.initial_state;
@@ -280,18 +331,19 @@ class DAFSA {
         }
       }
       if (!foundTransition) {
+        console.error(`Transition for "${character}" not found.`);
         return false; // Transition for the character does not exist; cannot remove
       }
     }
 
-    // Determine if this is Case 1 or Case 2
+    // Determine if this is Case 1, Case 2, or requires looping back
     if (this.states[currentState].length > 0) {
-      // **Case 1**: The final state has outgoing transitions, so we should only convert it to a non-final state
+      // Case 1: The final state has outgoing transitions, so we should only convert it to a non-final state
       if (this.final_states.includes(currentState)) {
         this.final_to_non_final_conversion(currentState);
       }
     } else {
-      // **Case 2**: The final state has no outgoing transitions, so we remove only this final state
+      // Case 2: The final state has no outgoing transitions, so we remove only this final state
       const { previousState } = path[path.length - 1];
 
       // Remove the transition from `previousState` to `currentState`
@@ -307,37 +359,71 @@ class DAFSA {
       this.non_final_states = this.non_final_states.filter(
         (state) => state !== currentState
       );
-    }
+      // Clean up dangling transitions for other states
+      for (const state in this.states) {
+        this.states[state] = this.states[state].filter(
+          (edge) => edge[0] !== currentState
+        );
+      }
+      // **Loop Back**: Check previous states and remove them if they are non-final and have no transitions
+      let backIndex = path.length - 2; // Start from the state before the last one
+      while (backIndex >= 0) {
+        const {
+          previousState: backPreviousState,
+          currentState: backCurrentState,
+        } = path[backIndex];
 
-    // Update history to remove the string and refresh the display
-    this.history = this.history.filter((str) => str !== s);
-    this.updateHistoryDisplay();
-
-    const machineDiv = document.getElementById("machine");
-
-    // Reset the machine if history is empty
-    if (this.history.length === 0) {
-      this.states = {}; // Clear all states
-      this.initial_state = null;
-      this.final_states = [];
-      this.non_final_states = [];
-      machineDiv.innerHTML = ""; // Clear the graph display
-    } else {
-      // Otherwise, redraw the machine as usual
-      machineDiv.innerHTML = ""; // Clear the existing graph
-      if (Object.keys(this.states).length > 0) {
-        if (document.getElementById("expanded").checked) {
-          machineDiv.appendChild(this.createDirectedGraph()); // Redraw the expanded machine
-        } else {
-          machineDiv.appendChild(this.minimize_dafsa().createDirectedGraph()); // Redraw the minimized machine
+        // If the current state has outgoing transitions or is a final state, stop the loop
+        if (
+          this.states[backCurrentState].length > 0 ||
+          this.final_states.includes(backCurrentState)
+        ) {
+          break;
         }
+
+        // Otherwise, remove the transition from the previous state to the current state
+        this.states[backPreviousState] = this.states[backPreviousState].filter(
+          (edge) => edge[0] !== backCurrentState
+        );
+
+        // Delete the current state if it has no transitions and is non-final
+        delete this.states[backCurrentState];
+        this.non_final_states = this.non_final_states.filter(
+          (state) => state !== backCurrentState
+        );
+
+        backIndex--; // Move to the next previous state
       }
     }
 
+    // Remove the string from the history
+    this.history = this.history.filter((str) => str !== s);
+
+    // Redrawing the machine as usual
+    const machineDiv = document.getElementById("machine");
+    const isExpanded = document.getElementById("expanded").checked;
+
+    machineDiv.innerHTML = ""; // Clear the existing graph
+    const minimizedMachine = this.minimize_dafsa();
+
+    if (Object.keys(this.states).length > 0) {
+      if (!isExpanded) {
+        //If its the minimized DAFSA
+        machineDiv.appendChild(minimizedMachine.createDirectedGraph());
+      }
+      if (isExpanded) {
+        //If its the expanded DAFSA
+        machineDiv.appendChild(this.createDirectedGraph()); // Redraw the expanded machine
+      }
+    }
+
+    // Update history to remove the string and refresh the display
+    this.updateHistoryDisplay();
     return true; // String successfully removed
   }
 
   createDirectedGraph() {
+    let states = Object.keys(this.states);
     machine.innerHTML = ""; //clears the machine
     let nodeHierarchy = {
       start: [],
@@ -347,7 +433,7 @@ class DAFSA {
     let symbols = ["~"]; // symbols used for transitions
     let linkArc = (d) =>
       `M${d.source.x},${d.source.y}A0,0 0 0,1 ${d.target.x},${d.target.y}`; //function to create the arrow head shape
-    for (const v of Object.keys(this.states)) {
+    for (const v of states) {
       //goes through the directed graph to collect all nodes, links and symbols
       //also used to create the hierarchy
       nodes.push({ id: v.toString() });
@@ -365,7 +451,10 @@ class DAFSA {
     }
     const color = d3.scaleOrdinal(symbols, d3.schemeCategory10); //creates different colored arrows depending on symbol
     const width = machine.offsetWidth; //width of figure is equal to the machine div's width
-    const height = machine.offsetHeight; //height of figure is equal to the machine div's height
+    let height = machine.offsetHeight; //height of figure is equal to the machine div's height
+    if (states.length > 4) {
+      height = machine.offsetHeight + 80 * (states.length - 4);
+    }
 
     const simulation = d3
       .forceSimulation(nodes)
@@ -393,7 +482,7 @@ class DAFSA {
       .join("marker")
       .attr("id", (d) => `arrow-${d}`) //to give it the arrow style and change the color depending on the symbol shown
       .attr("viewBox", "0 -5 10 10")
-      .attr("refX", 38)
+      .attr("refX", 30)
       .attr("refY", 0)
       //styling for the arrow
       .attr("markerWidth", 6)
@@ -465,33 +554,41 @@ class DAFSA {
       .attr("stroke", "black")
       .attr("opacity", (d) => (d.id === "start" ? 0 : 1))
       .attr("stroke-width", 1.5)
-      .attr("r", 25)
+      .attr("r", 20)
       .attr("class", (d) => d.id)
-      .attr("fill", (d) => "white");
+      .attr("fill", (d) => "#ADBADA")
+      .attr("class", (d) =>
+        d.id === "start"
+          ? "start"
+          : this.final_states.includes(d.id)
+          ? "final"
+          : "non-final"
+      );
     //if the state is a final state it adds another circle
     node
       .selectAll("circle.inner") // Select inner circles based on class
       .data((d) => (this.final_states.includes(d.id) ? [d] : [])) // Join data if the state is a final state
       .join("circle")
-      .attr("class", "inner") // Add class for conditional selection
-      .attr("r", 20) // Inner circle radius
+      .attr("class", "inner") // Adds class for conditional selection
+      .attr("r", 15) // Inner circle radius
       .attr("stroke", "black")
       .attr("stroke-width", 1.5)
       .attr("class", (d) => d.id)
-      .attr("fill", (d) => "white"); // Fill inner circle
+      .attr("fill", (d) => "#8697C3"); // Fill inner circle
 
     node
       .append("text")
-      .attr("x", -6) // Center text horizontally
-      .attr("y", 5) // Adjust y-coordinate for vertical positioning
+      .attr("x", -6) // Centering text horizontally
+      .attr("y", 5) // Adjusting y-coordinate for vertical positioning
       .text((d) => d.id)
-      .clone(true)
+      .attr("class", "node-text")
+      .clone(false)
       .lower()
       .attr("fill", "none")
       .attr("stroke", "white")
-      .attr("stroke-width", 3);
+      .attr("stroke-width", 1);
 
-    let spacing = 75; // Adjust spacing between nodes
+    let spacing = 65; // Adjust spacing between nodes
     let fxyList = [];
 
     //finds node based off node name
@@ -529,7 +626,13 @@ class DAFSA {
     }
 
     // Initial node positioning
-    positionNodes(findNode("start"), -100, -200, 0, 0); // Start with root node
+    positionNodes(
+      findNode("start"),
+      -100,
+      -height + (states.length / 2) * 150,
+      0,
+      0
+    ); // Start with root node
 
     // Start the simulation
     simulation.alpha(1).restart();
@@ -623,7 +726,7 @@ class DAFSA {
         for (const state of statesAtHeight) {
           const isFinal = newDafsa.final_states.includes(state);
 
-          const transitionKey = newDafsa.states[state]
+          const transitionKey = (newDafsa.states[state] || [])
             .map(([target]) => `${target}`)
             .sort()
             .join(", ");
@@ -665,6 +768,11 @@ class DAFSA {
 
   // Helper function to merge two states
   mergeStates(representative, stateToRemove) {
+    // Ensure the stateToRemove exists before proceeding
+    if (!this.states[stateToRemove]) {
+      console.warn(`State "${stateToRemove}" does not exist. Skipping merge.`);
+      return;
+    }
     // Redirect all incoming transitions to `stateToRemove` to `representative`
     Object.keys(this.states).forEach((state) => {
       const updatedTransitions = {};
