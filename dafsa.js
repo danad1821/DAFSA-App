@@ -1,4 +1,6 @@
 let machine = document.getElementById("machine");
+let resetBtn = document.getElementById("resetBtn");
+
 function validate(x, a, b) {
   if (x < a) x = a;
   if (x > b) x = b;
@@ -220,6 +222,8 @@ class DAFSA {
 
   updateHistoryDisplay() {
     const historyList = document.getElementById("history-list");
+    const acceptedStringCountElement = document.getElementById("countOfStrings"); // Correct selector
+
     historyList.innerHTML = ""; // Clear current history
     this.history.forEach((str) => {
       const listItem = document.createElement("li");
@@ -247,8 +251,30 @@ class DAFSA {
       // Add string and button to list item
       listItem.appendChild(removeButton);
       historyList.appendChild(listItem);
+
+      // Update the count of accepted strings
+      acceptedStringCountElement.textContent = this.history.length;
     });
   }
+
+  resetMachine() {
+    const machine = document.getElementById("machine");
+    machine.innerHTML = ""; // Clear the displayed graph
+
+    const historyList = document.getElementById("history-list");
+    historyList.innerHTML = ""; // Clear the history list
+
+    // Optionally clear the count as well
+    const acceptedStringCountElement = document.getElementById("countOfStrings");
+    acceptedStringCountElement.textContent = "0"; // Reset the count of accepted strings
+
+    updateHistoryDisplay(); // Call the function to update the history display
+
+
+    // If you want to also clear the history array in your class, you can reset it as well
+    this.history = []; // Clear the history array
+  }
+
 
   remove_accepted_string(s) {
     // Ensure the string is in the machine and can be removed
@@ -449,8 +475,8 @@ class DAFSA {
         d.id === "start"
           ? "start"
           : this.final_states.includes(d.id)
-          ? "final"
-          : "non-final"
+            ? "final"
+            : "non-final"
       );
     //if the state is a final state it adds another circle
     node

@@ -90,7 +90,8 @@ h1{
 .machineContent, #history{
   background-color: white;
   border: 1px solid black;
-  height: 57vh;
+  /* height: 57vh; */
+  height: 80vh;
 }
 
 #history{
@@ -156,6 +157,7 @@ h1{
 .final, .inner{
   fill: #8697C3;
 }
+
 .node-text, .linkLabel{
   font-size: 12px;
 }
@@ -203,6 +205,7 @@ h1{
 #downloadFormat{
   display: flex;
   flex-direction: row;
+  margin-top: 30px;
 }
 
 #downloadFormat label{
@@ -243,11 +246,15 @@ h1{
   height: 124px;
   border: 1px solid black;
   margin-top: 15px;
-  width: 1385px;
+  /* width: 1365px; */
+  width: 100%;
+  max-width: 1365px;
   margin-left: auto;
   margin-right: auto;
   display: flex;
   flex-direction: row;
+  margin-bottom: 15px;
+  padding: 10px;
 }
 
 
@@ -260,6 +267,16 @@ h1{
   justify-content: center;
   align-items: flex-start;
   height: 100%;
+}
+
+#count, #suggestedLanguages{
+  display: flex;
+  flex-direction: row;
+}
+
+#countOfStrings, #suggestedLanguages p:nth-child(2){
+  font-weight: normal;
+  margin-left: 10px;
 }
 
 #colors{
@@ -282,4 +299,38 @@ h1{
 
 #finalStateColorDrop, #nonFinalStateColorDrop{
   width: auto;
+}
+
+@media (max-width: 1200px){
+  #MainContent{
+    flex-direction: column; 
+  }
+
+  #history, #general-info{
+    width: 928px;
+  }
+
+}
+
+@media (max-width: 860px){
+  #general-info{
+    flex-direction: column;
+  }
+
+  #MachineInfo{
+    align-items: center;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 460px){
+
+  #general-info{
+    height: 150px;
+  }
+
+  #nonfinalStateColor label, #finalStatesColor label, #MachineInfo p{
+    font-size: 12px;
+  }
+
 }
