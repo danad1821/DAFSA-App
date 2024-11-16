@@ -1,145 +1,362 @@
-*{
+
+* {
   margin: 0;
   padding: 0;
+  font-family: "Roboto";
 }
-body{
-  background-color: #F0EAF4;
+body {
+  background-color: #f0eaf4;
 }
-h1{
-  padding: 20px;
+h1 {
+  padding: 10px;
   margin: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   text-align: center;
   border-radius: 12px;
-  background: linear-gradient(to right, #ADBADA, #7191E6);
+  background: linear-gradient(to right, #adbada 35%, #7191e6 65%);
   color: white;
 }
-.mainFunctions{
+.mainFunctions {
   display: flex;
   flex-direction: row;
   justify-content: center;
   gap: 50px;
   flex-wrap: wrap;
+  margin-bottom: 10px;
 }
-.mainFuntionInput{
-  border: 1px solid #3D52A1;
+.mainFuntionInput {
+  border: 1px solid #3d52a1;
   border-radius: 50px;
   font-size: 20px;
   min-width: 200px;
-  background-color: #ADBADA;
+  background-color: #adbada;
+  height: 50px;
+  display: flex;
+  align-items: center;
 }
-.mainFuntionInput input{
+.mainFuntionInput input {
   border: none;
   padding: 20px;
   border-radius: 50px;
-  min-width: 210px;
+  min-width: 200px;
   outline: none;
   background: none;
   color: white;
 }
-.mainFuntionInput button{
-  padding: 20px;
+.mainFuntionInput button {
+  padding: 10px;
   border-radius: 50px;
   border: none;
-  margin: 3px;
+  margin: 2px;
   min-width: 80px;
-  background-color: #3D52A1;
+  background-color: #3d52a1;
   color: white;
   font-size: 17px;
+  height: 45px;
   min-width: 100px;
 }
-.mainFuntionInput input::placeholder{
+.mainFuntionInput input::placeholder {
   color: white;
+  font-size: 12px;
 }
-.mainContent{
+.mainContent {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+  gap: 15px;
 }
-.mainContent>div{
+.mainContent > div {
   border-radius: 12px;
   border: 1px solid black;
   padding: 10px;
-  margin: 10px;
+  /* margin: 10px;
+  margin-right: 0px;
+  margin-bottom: 0px; */
   background-color: white;
 }
-.mainContent>div:first-child{
+/* .mainContent>div:first-child{
   min-width: 40vw;
-}
-.machineContent{
+} */
+.machineContent {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3px;
+  /* gap: 3px; */
+  width: 928px;
 }
-.toggle{
+
+.machineContent,
+#history {
+  background-color: white;
+  border: 1px solid black;
+  /* height: 57vh; */
+  height: 80vh;
+}
+
+#history {
+  margin-left: 0px;
+}
+
+.toggle {
   display: flex;
   justify-content: space-around;
   padding: 10px;
   border-radius: 50px;
   width: 200px;
   position: relative;
-  background-color: #3D52A1;
+  background-color: #3d52a1;
+  margin-top: 10px;
 }
-.checkboxOption{
+.checkboxOption {
   z-index: 10;
   cursor: pointer;
 }
-.toggle input[type=checkbox]{
+.toggle input[type="checkbox"] {
   display: none;
 }
-.toggle label{
+.toggle label {
   text-align: center;
   color: white;
 }
-.toggle-color{
+.toggle-color {
   position: absolute;
   top: 2px;
   left: 4px;
-  background-color: #ADBADA;
+  background-color: #adbada;
   border-radius: 50px;
   width: 48%;
   height: 90%;
   z-index: 5;
 }
-.emptyCheckboxDiv{
+.emptyCheckboxDiv {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-#emptyCheckbox{
+
+.emptyCheckboxDiv label {
+  font-size: 12px;
+}
+
+#emptyCheckbox {
   width: 20px;
   height: 20px;
   margin: 5px;
 }
-.machine-wrapper{
+.machine-wrapper {
   height: 400px;
   overflow-y: auto;
 }
-#machine{
+#machine {
   width: 70dvw;
   height: 400px;
   cursor: grab;
 }
-#history{
-  min-width: 20%;
-  height: 400px;
+.final,
+.inner {
+  fill: #8697c3;
 }
-#history-list{
+
+.node-text,
+.linkLabel {
+  font-size: 12px;
+}
+
+#history {
+  width: 400px;
+}
+
+#history h3 {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.removeBtn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+#history-list {
   display: flex;
   flex-wrap: wrap;
-  flex-direction: column;
+  flex-direction: row;
 }
-.stringAdded{
+.stringAdded {
   list-style: none;
   display: flex;
   border-radius: 12px;
-  background-color: #EEE8F6;
+  background-color: #eee8f6;
   justify-content: space-between;
   align-items: center;
   padding: 5px;
   margin: 5px;
   min-width: 50px;
-  border: 1px solid #3D52A1;
+  border: 2px solid #3d52a1;
+  width: 100px;
+}
+
+.stringAdded i {
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+#downloadFormat {
+  display: flex;
+  flex-direction: row;
+  margin-top: 30px;
+}
+
+#downloadFormat label {
+  margin-right: 10px;
+}
+
+#format,
+#finalStateColorDrop,
+#nonFinalStateColorDrop {
+  width: 70px;
+  background-color: #7191e6;
+  border-radius: 25px;
+  color: white;
+  text-align: center;
+  border: none;
+}
+
+#downloadBtn,
+#resetBtn {
+  width: 100px;
+  background-color: #7191e6;
+  color: white;
+  border: none;
+  padding: 5px;
+  border-radius: 25px;
+  margin-bottom: 3px;
+}
+
+#download-reset {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  margin-top: 5px;
+}
+
+#general-info {
+  background-color: white;
+  border-radius: 15px;
+  height: 124px;
+  border: 1px solid black;
+  margin-top: 15px;
+  /* width: 1365px; */
+  width: 100%;
+  max-width: 1365px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 15px;
+  padding: 10px;
+}
+
+#MachineInfo {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  line-height: 30px;
+  margin-left: 20px;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100%;
+}
+
+#count,
+#suggestedLanguages {
+  display: flex;
+  flex-direction: row;
+}
+
+#countOfStrings,
+#suggestedLanguages p:nth-child(2) {
+  font-weight: normal;
+  margin-left: 10px;
+}
+
+#colors {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  gap: 80px;
+}
+
+#nonfinalStateColor,
+#finalStatesColor {
+  display: flex;
+  flex-direction: column;
+  margin: 0 10px;
+  gap: 10px;
+  font-weight: bold;
+}
+
+#finalStateColorDrop,
+#nonFinalStateColorDrop {
+  width: auto;
+}
+
+@media (max-width: 1200px) {
+  #MainContent {
+    flex-direction: column;
+  }
+
+  #history,
+  #general-info {
+    width: 928px;
+  }
+}
+
+@media (max-width: 860px) {
+  #general-info {
+    flex-direction: column;
+  }
+
+  #MachineInfo {
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .mainFunctions {
+    gap: 10px;
+  }
+
+  .mainFuntionInput {
+    width: 300px !important;
+  }
+
+  .mainFuntionInput input {
+    min-width: 187px !important;
+  }
+
+  .mainFuntionInput button {
+    min-width: 70px !important;
+  }
+
+  .mainContent {
+    margin: 0 20px;
+  }
+}
+
+@media (max-width: 460px) {
+  #general-info {
+    height: 150px;
+  }
+
+  #nonfinalStateColor label,
+  #finalStatesColor label,
+  #MachineInfo p {
+    font-size: 12px;
+  }
 }

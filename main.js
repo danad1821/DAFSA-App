@@ -3,7 +3,7 @@ let M = new DAFSA();
 
 let addBtn = document.getElementById("addBtn");
 let acceptedString = document.getElementById("acceptedString");
-let resetBtn = document.getElementById("resetBtn");
+let reset = document.getElementById("resetBtn");
 let emptyStringCheckBox = document.getElementById("emptyCheckbox");
 let displayOptions = document.querySelectorAll(".toggle input[type=checkbox]");
 let colorDiv = document.querySelector(".toggle-color");
@@ -59,12 +59,10 @@ searchBtn.addEventListener("click", function () {
   searchText.value = "";
 });
 
-function resetMachine() {
-  D = new DAFSA();
-  machine.innerHTML = ""; // Clear the displayed graph
-}
 
-resetBtn.addEventListener("click", resetMachine);
+reset.addEventListener("click", function () {
+  D.resetMachine(); // Call the resetMachine method on the D instance
+});
 
 emptyStringCheckBox.addEventListener("change", () => {
   D.acceptance_of_empty_string(emptyStringCheckBox.checked);
@@ -124,4 +122,39 @@ displayOptions[1].addEventListener("change", () => {
     id = setInterval(moveLeft, 0.5);
     machine.appendChild(M.createDirectedGraph());
   }
+});
+
+// Change the color of non-final states
+document.getElementById('nonFinalStateColorDrop').addEventListener('change', function () {
+  const selectedColor = this.value;
+  const nonFinalStates = document.querySelectorAll('.non-final');
+  nonFinalStates.forEach(function (state) {
+    state.style.fill = selectedColor;
+  });
+});
+
+// // Change the color of final states
+// document.getElementById('finalStateColorDrop').addEventListener('change', function () {
+//   const selectedColor = this.value;
+//   const finalStates = document.querySelectorAll('.final, .inner');
+//   finalStates.forEach(function (state) {
+//     state.style.fill = selectedColor;
+//   });
+// });
+
+
+document.getElementById('finalStateColorDrop').addEventListener('change', function () {
+  const selectedColor = this.value;
+  const finalStates = document.querySelectorAll('.final');
+  const innerStates = document.querySelectorAll('.inner');
+
+
+  finalStates.forEach(function (state) {
+    state.style.fill = selectedColor;
+  });
+
+
+  innerStates.forEach(function (state) {
+    state.style.fill = selectedColor;
+  });
 });
