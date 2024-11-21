@@ -190,3 +190,4 @@ document.getElementById('finalStateColorDrop').addEventListener('change', functi
     state.style.fill = selectedColor;
   });
 });
+

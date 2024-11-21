@@ -593,14 +593,9 @@ class DAFSA {
       .attr("stroke", "black")
       .attr("stroke-width", 1.5)
       .attr("class", (d) => d.id)
-      // .attr("fill", (d) => "#8697C3"); // Fill inner circle
-      .style("fill", (d) => {
-        // Apply a style instead of fixed color
-        if (document.getElementById('finalStateColorDrop')) {
-          return document.getElementById('finalStateColorDrop').value;
-        }
-        return "#8697C3";
-      });
+      .attr("fill", (d) => "#8697C3"); // Fill inner circle
+
+
     node
       .append("text")
       .attr("x", -6) // Centering text horizontally
