@@ -154,8 +154,7 @@ h1 {
   height: 400px;
   cursor: grab;
 }
-.final,
-.inner {
+.final{
   fill: #8697c3;
 }
 
@@ -258,6 +257,7 @@ h1 {
   flex-direction: row;
   margin-bottom: 15px;
   padding: 10px;
+  margin-top: 0;
 }
 
 #MachineInfo {
@@ -306,7 +306,7 @@ h1 {
   width: auto;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1300px) {
   #MainContent {
     flex-direction: column;
   }

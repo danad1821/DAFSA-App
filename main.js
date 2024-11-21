@@ -73,22 +73,54 @@ emptyStringCheckBox.addEventListener("change", () => {
   }
 });
 
-function downloadGraphAsImage() {
-  const svgElement = document.querySelector("#machine");
-  const format = document.getElementById("format").value;
 
-  html2canvas(svgElement, {
-    useCORS: true, // Enables cross-origin images if any are used
-    scale: 2, // Increases the resolution of the downloaded image
-    backgroundColor: "#ffffff", // Sets a white background
-  }).then((canvas) => {
-    // Create a download link
+// function downloadGraphAsImage() {
+//   const svgElement = document.querySelector("#machine");
+//   const format = document.getElementById("format").value;
+
+//   html2canvas(svgElement, {
+//     useCORS: true, // Enables cross-origin images if any are used
+//     scale: 2, // Increases the resolution of the downloaded image
+//     backgroundColor: "#ffffff", // Sets a white background
+//   }).then((canvas) => {
+//     // Create a download link
+//     const link = document.createElement("a");
+//     link.download = `DAFSA - machine - image.${format}`;
+//     link.href = canvas.toDataURL(`image / ${format}`);
+//     link.click();
+//   });
+// }
+
+function downloadGraphAsImage() {
+  const element = document.querySelector("#machine"); // Your graph element
+  const format = document.querySelector("#format").value; // Format selected by the user (PNG or JPEG)
+
+  // Use html2canvas to capture the content of the element
+  html2canvas(element, {
+    useCORS: true, // Enable CORS to handle external resources
+    scale: 2, // Set scale for higher resolution images
+    backgroundColor: "#ffffff", // Background color if there's transparency
+    x: 0,
+    y: 0,
+    width: element.scrollWidth, // Full width of the scrollable content
+    height: element.scrollHeight, // Full height of the scrollable content
+    scrollX: 0,
+    scrollY: -window.scrollY, // Correct the scroll position
+  }).then(function (canvas) {
+    // Convert the canvas to image data in the selected format
+    const imageData = canvas.toDataURL("image/" + format); // Based on selected format
+
+    // Convert image data URL to an octet-stream for download
+    const newData = imageData.replace(/^data:image\/(png|jpeg)/, "data:application/octet-stream");
+
+    // Set up the download link and trigger the download
     const link = document.createElement("a");
-    link.download = `DAFSA-machine-image.${format}`;
-    link.href = canvas.toDataURL(`image/${format}`);
-    link.click();
+    link.download = `DAFSA-graph-image.${format}`;
+    link.href = newData;
+    link.click(); // Trigger the download
   });
 }
+
 
 function moveLeft() {
   if (pos == 110) {
