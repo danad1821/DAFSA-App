@@ -158,6 +158,11 @@ class DAFSA {
   }
 
   add_accepted_string(s) {
+    if (!s || s.trim() === "") {
+      console.error("Cannot add an empty or invalid string.");
+      return;
+    }
+
     const slen = s.length;
     if (this.initial_state === null) {
       // if it is the first string to be accepted by the machine
@@ -196,10 +201,18 @@ class DAFSA {
         }
       }
       // the state already exists and might just need to be converted into a final state
+      // the state already exists and might just need to be converted into a final state
       if (ind === slen) {
-        this.non_final_to_final_conversion(currentState); // converts from non final to final state
+        this.non_final_to_final_conversion(currentState); // converts from non-final to final state
+
+        // Ensure 's' is added to the history even if it's a substring of an existing string
+        if (!this.history.includes(s)) {
+          this.history.push(s);
+        }
+        this.updateHistoryDisplay(); // Update the history display
         return;
       }
+
       let n = Object.keys(this.states).length; // get the number of states in the machine
       //
       for (let index = 0; index < slen; index++) {
@@ -218,17 +231,30 @@ class DAFSA {
     // Add the string to the history and display it
     this.history.push(s);
     this.updateHistoryDisplay();
+    if (this.history.includes(s)) {
+      console.log(`String "${s}" is added to history.`);
+    } else {
+      console.log(`String "${s}" already exists in history. Re-adding.`);
+      this.history.push(s); // Ensure the string is added to history
+    }
   }
 
   updateHistoryDisplay() {
     const historyList = document.getElementById("history-list");
-    const acceptedStringCountElement = document.getElementById("countOfStrings"); // Correct selector
+    const acceptedStringCountElement =
+      document.getElementById("countOfStrings"); // Correct selector
+
+    if (!historyList || !acceptedStringCountElement) {
+      console.error("DOM elements for history display are missing.");
+      return;
+    }
 
     historyList.innerHTML = ""; // Clear current history
     this.history.forEach((str) => {
       const listItem = document.createElement("li");
       listItem.textContent = str;
       listItem.className = "stringAdded";
+
       // Create Remove button
       const removeButton = document.createElement("button");
       // removeButton.textContent = "Remove";
@@ -244,10 +270,9 @@ class DAFSA {
         if (this.remove_accepted_string(str)) {
           this.updateHistoryDisplay(); // Refresh the display after removal
         } else {
-          alert("Could not remove the string from the machine.");
+          alert(`Could not remove the string "${str}" from the machine.`);
         }
       };
-
       // Add string and button to list item
       listItem.appendChild(removeButton);
       historyList.appendChild(listItem);
@@ -255,6 +280,24 @@ class DAFSA {
       // Update the count of accepted strings
       acceptedStringCountElement.textContent = this.history.length;
     });
+  }
+
+  resetMachine() {
+    const machine = document.getElementById("machine");
+    machine.innerHTML = ""; // Clear the displayed graph
+
+    const historyList = document.getElementById("history-list");
+    historyList.innerHTML = ""; // Clear the history list
+
+    // Optionally clear the count as well
+    const acceptedStringCountElement =
+      document.getElementById("countOfStrings");
+    acceptedStringCountElement.textContent = "0"; // Reset the count of accepted strings
+
+    updateHistoryDisplay(); // Call the function to update the history display
+
+    // If you want to also clear the history array in your class, you can reset it as well
+    this.history = []; // Clear the history array
   }
 
   resetMachine() {
@@ -279,60 +322,122 @@ class DAFSA {
   remove_accepted_string(s) {
     // Ensure the string is in the machine and can be removed
     if (!this.history.includes(s)) {
-      return false; // String is not in history, cannot be removed
+      console.error(`String "${s}" does not exist in history.`); // String is not in history, cannot be removed
+      return false;
+    }
+    // Reset the machine if history is empty
+    if (this.history.length === 0) {
+      this.resetMachine();
+      return true;
     }
 
     let currentState = this.initial_state;
-    let previousState = null;
     let path = []; // Track the path of states and characters
 
     // Traverse and record each state and transition used by the string
     for (const character of s) {
-      let foundTransition = false; // Track if a valid transition is found
+      let foundTransition = false;
       for (const edge of this.states[currentState]) {
         if (edge[1] === character) {
-          previousState = currentState;
+          path.push({
+            previousState: currentState,
+            currentState: edge[0],
+            character,
+          });
           currentState = edge[0];
-          path.push({ previousState, currentState, character });
-          foundTransition = true; // A transition was found
+          foundTransition = true;
           break;
         }
       }
       if (!foundTransition) {
-        return false; // If no transition found, the string cannot be removed
+        console.error(`Transition for "${character}" not found.`);
+        return false; // Transition for the character does not exist; cannot remove
       }
     }
 
-    // Convert final state to non-final state if necessary
-    if (this.final_states.includes(currentState)) {
-      this.final_to_non_final_conversion(currentState);
-    }
-
-    // Backtrack to remove transitions and orphaned states
-    for (let i = path.length - 1; i >= 0; i--) {
-      const { previousState, currentState, character } = path[i];
+    // Determine if this is Case 1, Case 2, or requires looping back
+    if (this.states[currentState].length > 0) {
+      // Case 1: The final state has outgoing transitions, so we should only convert it to a non-final state
+      if (this.final_states.includes(currentState)) {
+        this.final_to_non_final_conversion(currentState);
+      }
+    } else {
+      // Case 2: The final state has no outgoing transitions, so we remove only this final state
+      const { previousState } = path[path.length - 1];
 
       // Remove the transition from `previousState` to `currentState`
       this.states[previousState] = this.states[previousState].filter(
-        (edge) => edge[0] !== currentState || edge[1] !== character
+        (edge) => edge[0] !== currentState
       );
 
-      // If `currentState` has no incoming or outgoing transitions, delete it
-      if (this.states[currentState] && this.states[currentState].length === 0) {
-        delete this.states[currentState];
-        this.final_states = this.final_states.filter(
-          (state) => state !== currentState
+      // Delete the final state itself from the internal structure
+      delete this.states[currentState];
+      this.final_states = this.final_states.filter(
+        (state) => state !== currentState
+      );
+      this.non_final_states = this.non_final_states.filter(
+        (state) => state !== currentState
+      );
+      // Clean up dangling transitions for other states
+      for (const state in this.states) {
+        this.states[state] = this.states[state].filter(
+          (edge) => edge[0] !== currentState
         );
+      }
+      // **Loop Back**: Check previous states and remove them if they are non-final and have no transitions
+      let backIndex = path.length - 2; // Start from the state before the last one
+      while (backIndex >= 0) {
+        const {
+          previousState: backPreviousState,
+          currentState: backCurrentState,
+        } = path[backIndex];
+
+        // If the current state has outgoing transitions or is a final state, stop the loop
+        if (
+          this.states[backCurrentState].length > 0 ||
+          this.final_states.includes(backCurrentState)
+        ) {
+          break;
+        }
+
+        // Otherwise, remove the transition from the previous state to the current state
+        this.states[backPreviousState] = this.states[backPreviousState].filter(
+          (edge) => edge[0] !== backCurrentState
+        );
+
+        // Delete the current state if it has no transitions and is non-final
+        delete this.states[backCurrentState];
         this.non_final_states = this.non_final_states.filter(
-          (state) => state !== currentState
+          (state) => state !== backCurrentState
         );
+
+        backIndex--; // Move to the next previous state
+      }
+    }
+
+    // Remove the string from the history
+    this.history = this.history.filter((str) => str !== s);
+
+    // Redrawing the machine as usual
+    const machineDiv = document.getElementById("machine");
+    const isExpanded = document.getElementById("expanded").checked;
+
+    machineDiv.innerHTML = ""; // Clear the existing graph
+    const minimizedMachine = this.minimize_dafsa();
+
+    if (Object.keys(this.states).length > 0) {
+      if (!isExpanded) {
+        //If its the minimized DAFSA
+        machineDiv.appendChild(minimizedMachine.createDirectedGraph());
+      }
+      if (isExpanded) {
+        //If its the expanded DAFSA
+        machineDiv.appendChild(this.createDirectedGraph()); // Redraw the expanded machine
       }
     }
 
     // Update history to remove the string and refresh the display
-    this.history = this.history.filter((str) => str !== s);
     this.updateHistoryDisplay();
-
     return true; // String successfully removed
   }
 
@@ -475,8 +580,8 @@ class DAFSA {
         d.id === "start"
           ? "start"
           : this.final_states.includes(d.id)
-            ? "final"
-            : "non-final"
+          ? "final"
+          : "non-final"
       );
     //if the state is a final state it adds another circle
     node
@@ -640,7 +745,7 @@ class DAFSA {
         for (const state of statesAtHeight) {
           const isFinal = newDafsa.final_states.includes(state);
 
-          const transitionKey = newDafsa.states[state]
+          const transitionKey = (newDafsa.states[state] || [])
             .map(([target]) => `${target}`)
             .sort()
             .join(", ");
@@ -682,6 +787,11 @@ class DAFSA {
 
   // Helper function to merge two states
   mergeStates(representative, stateToRemove) {
+    // Ensure the stateToRemove exists before proceeding
+    if (!this.states[stateToRemove]) {
+      console.warn(`State "${stateToRemove}" does not exist. Skipping merge.`);
+      return;
+    }
     // Redirect all incoming transitions to `stateToRemove` to `representative`
     Object.keys(this.states).forEach((state) => {
       const updatedTransitions = {};
