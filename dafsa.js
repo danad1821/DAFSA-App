@@ -242,7 +242,7 @@ class DAFSA {
   updateHistoryDisplay() {
     const historyList = document.getElementById("history-list");
     const acceptedStringCountElement =
-      document.getElementById("countOfStrings"); // Correct selector
+      document.getElementById("countOfStrings");
 
     if (!historyList || !acceptedStringCountElement) {
       console.error("DOM elements for history display are missing.");
@@ -257,11 +257,9 @@ class DAFSA {
 
       // Create Remove button
       const removeButton = document.createElement("button");
-      // removeButton.textContent = "Remove";
       removeButton.className = "removeBtn";
-      // removeButton.onclick = () => this.remove_accepted_string(str);
 
-      // Add Font Awesome trash icon
+      // Font Awesome trash icon
       const trashIcon = document.createElement("i");
       trashIcon.className = "fas fa-trash";
       removeButton.appendChild(trashIcon);
@@ -282,23 +280,23 @@ class DAFSA {
     });
   }
 
-  resetMachine() {
-    const machine = document.getElementById("machine");
-    machine.innerHTML = ""; // Clear the displayed graph
+  // resetMachine() {
+  //   const machine = document.getElementById("machine");
+  //   machine.innerHTML = ""; // Clear the displayed graph
 
-    const historyList = document.getElementById("history-list");
-    historyList.innerHTML = ""; // Clear the history list
+  //   const historyList = document.getElementById("history-list");
+  //   historyList.innerHTML = ""; // Clear the history list
 
-    // Optionally clear the count as well
-    const acceptedStringCountElement =
-      document.getElementById("countOfStrings");
-    acceptedStringCountElement.textContent = "0"; // Reset the count of accepted strings
+  //   // Optionally clear the count as well
+  //   const acceptedStringCountElement =
+  //     document.getElementById("countOfStrings");
+  //   acceptedStringCountElement.textContent = "0"; // Reset the count of accepted strings
 
-    updateHistoryDisplay(); // Call the function to update the history display
+  //   updateHistoryDisplay(); // Call the function to update the history display
 
-    // If you want to also clear the history array in your class, you can reset it as well
-    this.history = []; // Clear the history array
-  }
+  //   // If you want to also clear the history array in your class, you can reset it as well
+  //   this.history = []; // Clear the history array
+  // }
 
   resetMachine() {
     const machine = document.getElementById("machine");
@@ -384,7 +382,7 @@ class DAFSA {
           (edge) => edge[0] !== currentState
         );
       }
-      // **Loop Back**: Check previous states and remove them if they are non-final and have no transitions
+      // Check previous states and remove them if they are non-final and have no transitions
       let backIndex = path.length - 2; // Start from the state before the last one
       while (backIndex >= 0) {
         const {
@@ -418,7 +416,7 @@ class DAFSA {
     // Remove the string from the history
     this.history = this.history.filter((str) => str !== s);
 
-    // Redrawing the machine as usual
+    // Redrawing the machine
     const machineDiv = document.getElementById("machine");
     const isExpanded = document.getElementById("expanded").checked;
 

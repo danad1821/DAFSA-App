@@ -165,29 +165,19 @@ document.getElementById('nonFinalStateColorDrop').addEventListener('change', fun
   });
 });
 
-// // Change the color of final states
-// document.getElementById('finalStateColorDrop').addEventListener('change', function () {
-//   const selectedColor = this.value;
-//   const finalStates = document.querySelectorAll('.final, .inner');
-//   finalStates.forEach(function (state) {
-//     state.style.fill = selectedColor;
-//   });
-// });
-
 
 document.getElementById('finalStateColorDrop').addEventListener('change', function () {
   const selectedColor = this.value;
-  const finalStates = document.querySelectorAll('.final');
-  const innerStates = document.querySelectorAll('.inner');
 
+  document.querySelectorAll('circle.final').forEach(function (finalCircle) {
+    // Update outer (final) circle
+    finalCircle.style.fill = selectedColor;
 
-  finalStates.forEach(function (state) {
-    state.style.fill = selectedColor;
-  });
-
-
-  innerStates.forEach(function (state) {
-    state.style.fill = selectedColor;
+    // Update inner circle within the same <g> group
+    const innerCircle = finalCircle.parentNode.querySelector('circle:not(.final)');
+    if (innerCircle) {
+      innerCircle.style.fill = selectedColor;
+    }
   });
 });
 
