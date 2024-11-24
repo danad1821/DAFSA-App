@@ -162,6 +162,7 @@ document.getElementById('nonFinalStateColorDrop').addEventListener('change', fun
   const nonFinalStates = document.querySelectorAll('.non-final');
   nonFinalStates.forEach(function (state) {
     state.style.fill = selectedColor;
+    sessionStorage.setItem("nonFinalColor", selectedColor)
   });
 });
 
@@ -177,6 +178,7 @@ document.getElementById('finalStateColorDrop').addEventListener('change', functi
     const innerCircle = finalCircle.parentNode.querySelector('circle:not(.final)');
     if (innerCircle) {
       innerCircle.style.fill = selectedColor;
+      sessionStorage.setItem("finalColor", selectedColor)
     }
   });
 });

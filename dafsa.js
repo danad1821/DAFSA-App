@@ -118,9 +118,16 @@ class DAFSA {
           this.colorChange("red", curNodes);
         }, 500 * curIndex);
       }
+      if (this.final_states.includes(state)) {
       setTimeout(() => {
-        this.colorChange("white", curNodes);
+        this.colorChange(sessionStorage.getItem("finalColor"), curNodes);
       }, 10000);
+    }
+    else{
+      setTimeout(() => {
+        this.colorChange(sessionStorage.getItem("nonFinalColor"), curNodes);
+      }, 10000);
+    }
     }
   }
 
@@ -306,16 +313,15 @@ class DAFSA {
     historyList.innerHTML = ""; // Clear the history list
 
     // Optionally clear the count as well
-    const acceptedStringCountElement = document.getElementById("countOfStrings");
+    const acceptedStringCountElement =
+      document.getElementById("countOfStrings");
     acceptedStringCountElement.textContent = "0"; // Reset the count of accepted strings
 
     updateHistoryDisplay(); // Call the function to update the history display
 
-
     // If you want to also clear the history array in your class, you can reset it as well
     this.history = []; // Clear the history array
   }
-
 
   remove_accepted_string(s) {
     // Ensure the string is in the machine and can be removed
@@ -572,15 +578,15 @@ class DAFSA {
       .attr("opacity", (d) => (d.id === "start" ? 0 : 1))
       .attr("stroke-width", 1.5)
       .attr("r", 20)
-      .attr("class", (d) => d.id)
       .attr("fill", (d) => "#ADBADA")
       .attr("class", (d) =>
         d.id === "start"
           ? "start"
           : this.final_states.includes(d.id)
-            ? "final"
-            : "non-final"
+          ? "final "+d.id
+          : "non-final "+d.id
       );
+      // .attr("class", (d) => d.id);
     //if the state is a final state it adds another circle
     node
       .selectAll("circle.inner") // Select inner circles based on class
@@ -593,13 +599,12 @@ class DAFSA {
       .attr("class", (d) => d.id)
       .attr("fill", (d) => "#8697C3"); // Fill inner circle
 
-
     node
       .append("text")
       .attr("x", -6) // Centering text horizontally
       .attr("y", 5) // Adjusting y-coordinate for vertical positioning
       .text((d) => d.id)
-      .attr('class', 'node-text')
+      .attr("class", "node-text")
       .clone(false)
       .lower()
       .attr("fill", "none")
