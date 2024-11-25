@@ -59,7 +59,6 @@ searchBtn.addEventListener("click", function () {
   searchText.value = "";
 });
 
-
 reset.addEventListener("click", function () {
   D.resetMachine(); // Call the resetMachine method on the D instance
 });
@@ -67,29 +66,16 @@ reset.addEventListener("click", function () {
 emptyStringCheckBox.addEventListener("change", () => {
   D.acceptance_of_empty_string(emptyStringCheckBox.checked);
   if (emptyStringCheckBox.checked == true || Object.keys(D.states).length > 1) {
-    machine.appendChild(D.createDirectedGraph());
+    M = D.minimize_dafsa();
+    if (displayOptions[0].checked) {
+      machine.appendChild(D.createDirectedGraph());
+    } else {
+      machine.appendChild(M.createDirectedGraph());
+    }
   } else {
     machine.innerHTML = "";
   }
 });
-
-
-// function downloadGraphAsImage() {
-//   const svgElement = document.querySelector("#machine");
-//   const format = document.getElementById("format").value;
-
-//   html2canvas(svgElement, {
-//     useCORS: true, // Enables cross-origin images if any are used
-//     scale: 2, // Increases the resolution of the downloaded image
-//     backgroundColor: "#ffffff", // Sets a white background
-//   }).then((canvas) => {
-//     // Create a download link
-//     const link = document.createElement("a");
-//     link.download = `DAFSA - machine - image.${format}`;
-//     link.href = canvas.toDataURL(`image / ${format}`);
-//     link.click();
-//   });
-// }
 
 function downloadGraphAsImage() {
   const element = document.querySelector("#machine"); // Your graph element
@@ -111,7 +97,10 @@ function downloadGraphAsImage() {
     const imageData = canvas.toDataURL("image/" + format); // Based on selected format
 
     // Convert image data URL to an octet-stream for download
-    const newData = imageData.replace(/^data:image\/(png|jpeg)/, "data:application/octet-stream");
+    const newData = imageData.replace(
+      /^data:image\/(png|jpeg)/,
+      "data:application/octet-stream"
+    );
 
     // Set up the download link and trigger the download
     const link = document.createElement("a");
@@ -120,7 +109,6 @@ function downloadGraphAsImage() {
     link.click(); // Trigger the download
   });
 }
-
 
 function moveLeft() {
   if (pos == 110) {
@@ -157,29 +145,32 @@ displayOptions[1].addEventListener("change", () => {
 });
 
 // Change the color of non-final states
-document.getElementById('nonFinalStateColorDrop').addEventListener('change', function () {
-  const selectedColor = this.value;
-  const nonFinalStates = document.querySelectorAll('.non-final');
-  nonFinalStates.forEach(function (state) {
-    state.style.fill = selectedColor;
-    sessionStorage.setItem("nonFinalColor", selectedColor)
+document
+  .getElementById("nonFinalStateColorDrop")
+  .addEventListener("change", function () {
+    const selectedColor = this.value;
+    const nonFinalStates = document.querySelectorAll(".non-final");
+    nonFinalStates.forEach(function (state) {
+      state.style.fill = selectedColor;
+      sessionStorage.setItem("nonFinalColor", selectedColor);
+    });
   });
-});
 
+document
+  .getElementById("finalStateColorDrop")
+  .addEventListener("change", function () {
+    const selectedColor = this.value;
 
-document.getElementById('finalStateColorDrop').addEventListener('change', function () {
-  const selectedColor = this.value;
+    document.querySelectorAll("circle.final").forEach(function (finalCircle) {
+      // Update outer (final) circle
+      finalCircle.style.fill = selectedColor;
 
-  document.querySelectorAll('circle.final').forEach(function (finalCircle) {
-    // Update outer (final) circle
-    finalCircle.style.fill = selectedColor;
-
-    // Update inner circle within the same <g> group
-    const innerCircle = finalCircle.parentNode.querySelector('circle:not(.final)');
-    if (innerCircle) {
-      innerCircle.style.fill = selectedColor;
-      sessionStorage.setItem("finalColor", selectedColor)
-    }
+      // Update inner circle within the same <g> group
+      const innerCircle =
+        finalCircle.parentNode.querySelector("circle:not(.final)");
+      if (innerCircle) {
+        innerCircle.style.fill = selectedColor;
+        sessionStorage.setItem("finalColor", selectedColor);
+      }
+    });
   });
-});
-
